@@ -1,0 +1,39 @@
+Core
+
+In Reih und Glied
+1 Deck, von uns vorgegeben
+Clojure → Java Deck
+Zufallswahl, wer anfängt
+Anzahl der Karten bestimmen
+Anzahl der Spieler genau 2	
+Zeitlimit pro Runde anstellbar
+Spieler einladen per Link
+
+Nice to have
+
+HighScore
+Karten zufällig gedreht und verteilt
+Animationen der Karten
+Schere, Stein Papier wer anfängt
+Mehrere Decks, Deck hochladen
+mehr als 2 Karten pro Paar
+Mehr als 2 Spieler
+Computer Gegner, in verschiedenen Schwierigkeitsstufen
+Lokales Spiel, 	1-2 Spieler	
+Accounts
+
+Projekt Setup
+
+Continuous Integration
+TDD
+Protected Master
+Code Review
+
+Technologien
+
+ClojureScript Frontend
+Clojure
+Keine Datenbank
+
+Aufteilung
+

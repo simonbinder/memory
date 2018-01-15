@@ -1,0 +1,53 @@
+Objekt Spielstand:
+- Spieler 1
+  - resolvedPairs: alle aufgedeckte IDs
+- Spieler 2
+  - resolvedPairs: alle aufgedeckte IDs
+- Link
+- closedCards: Map von Karten (ID: Karte), Karte immer doppelt (wegen Paaren)
+- activateUser
+  - openCards
+------------------------------------------
+User erstellt Game clientseitig
+
+Unser Deck hat:
+- 36 Karten
+- Bilder
+
+Client:
+Event createGame()
+
+Server:
+- erhält Event createGame
+ --> registriert User1
+ --> erstellt Spiel mit Link
+ --> Spielfeld wird berechnet
+Event redirectUserToGame
+ --> leitet Spieler 1 weiter auf Link
+ --> Anordnung der Bilder als Map
+
+Client:
+- erhält Event redirectUserToGame
+  --> Spielfeld wird gerendert
+  --> noch keine Aktionen möglich
+
+Spieler kann Link an Spieler 2 schicken
+- Event registerUser()
+
+Server:
+- erhält registerUser, das User2 registriert
+  --> Broadcast startGame()
+  --> Event activateUser(), ein User wird gewählt, der beginnt, daraufhin abwechselnd
+
+Client:
+- User clickt auf Karte
+  --> Event selectCard()
+
+Server:
+- erste Karte:
+  --> Event an beide User openCard()
+- zweite Karte:
+ --> Auflösung und grafisches Feedback, welcher User es gelöst hat (Counter?) openCard()
+ --> Event changeActiveUser()
+
+ --> wenn alle Paare gelöst sind, Spiel beenden Broadcast endGame()

@@ -4,9 +4,9 @@ Objekt Spielstand:
 - Spieler 2
   - resolvedPairs: alle aufgedeckte IDs
 - Link
-- closedCards: Map von Karten (ID: Karte), Karte immer doppelt (wegen Paaren)
+- closedCards: Map von Karten (ID: Karte), Karte immer doppelt (wegen Paaren), SHUFFLED
 - activateUser
-  - openCards
+  - openCards 
 ------------------------------------------
 User erstellt Game clientseitig
 
@@ -21,18 +21,26 @@ Server:
 - erhält Event createGame
  --> registriert User1
  --> erstellt Spiel mit Link
- --> Spielfeld wird berechnet
-Event redirectUserToGame
- --> leitet Spieler 1 weiter auf Link
- --> Anordnung der Bilder als Map
+ --> Spielobjekt erstellen (siehe oben)
+ --> sendet Link an Client
 
-Client:
-- erhält Event redirectUserToGame
-  --> Spielfeld wird gerendert
+
+**(2 mal) ------------->>>>>>>>>>**
+
+Client follows link:
+  --> RequestGameSetupEvent
+
+Server
+  --> RequestGameSetupEvent handlen:
+  ----> user registrieren
+  ----> geshuffeltes Deck an Client mit gameSetupEvent
+  
+ Client 
+  --> erhält GameSetupEvent mit Spielfeld
+  --> Spielfeld wird gerendert, entsprechend der Reihenfolge
   --> noch keine Aktionen möglich
 
-Spieler kann Link an Spieler 2 schicken
-- Event registerUser()
+** <<<<<<<-------------**
 
 Server:
 - erhält registerUser, das User2 registriert

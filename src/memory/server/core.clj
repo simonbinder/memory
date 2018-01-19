@@ -3,43 +3,53 @@
   (:require
   [taoensso.sente :as sente]
   [compojure.core :as compojure]
+  [ring.middleware.cors :as cors]
   [ring.middleware.params :refer [wrap-params]]
   [ring.middleware.keyword-params :refer [wrap-keyword-params]]
   [taoensso.sente.server-adapters.http-kit      :refer (get-sch-adapter)]))
 
-;;(declare channel-socket)
-;;(defmulti event :id)
+(declare channel-socket)
+(defmulti event :id)
 
-  (let [{:keys [ch-recv send-fn connected-uids
-                ajax-post-fn ajax-get-or-ws-handshake-fn]}
-        (sente/make-channel-socket! (get-sch-adapter) {})]
+(defmethod event :default [{:as ev-msg :keys [event]}]
+  (println "Unhandled event: " event))
 
-    (def ring-ajax-post                ajax-post-fn)
-    (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-    (def ch-chsk                       ch-recv) ; ChannelSocket's receive channel
-    (def chsk-send!                    send-fn) ; ChannelSocket's send API fn
-    (def connected-uids                connected-uids) ; Watchable, read-only atom
-  )
+(defmethod event :test/id1 [{:as ev-msg :keys [event uid ?data]}]
+  (println "Hello: " uid ?data))
 
-(compojure/defroutes my-app-routes
-  (compojure/GET "/" [] {:body "Hello World!"
-                           :status 200
-                           :headers {"Content-Type" "text/plain"}})
-  (compojure/GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
-  (compojure/POST "/chsk" req (ring-ajax-post                req))
-)
+(defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
+    (println "New connection:" uid client-id))
 
-;;(defn start-router []
-;;  (defonce router
-;;    (sente/start-chsk-router! (:ch-recv channel-socket) event)))
+(defmethod event :chsk/uidport-close [{:keys [uid]}]
+      (println "Disconnected:" uid))
+
+(defmethod event :chsk/ws-ping [_])
+
+(defn start-websocket []
+  (defonce channel-socket
+    (sente/make-channel-socket!
+            (get-sch-adapter))))
+
+(compojure/defroutes routes
+    ; (compojure/GET "/status" req (str "Running: " (pr-str @(:connected-uids channel-socket))))
+    (compojure/GET "/chsk" req ((:ajax-get-or-ws-handshake-fn channel-socket) req))
+    (compojure/POST "/chsk" req ((:ajax-post-fn channel-socket) req)))
+
+(defn start-router []
+ (defonce router
+   (sente/start-chsk-router! (:ch-recv channel-socket) event)))
 
 (def my-app
-  (-> my-app-routes
+  (-> routes
       ;; Add necessary Ring middleware:
       (wrap-keyword-params)
-      (wrap-params)))
+      (wrap-params)
+      (cors/wrap-cors :access-control-allow-origin [#".*"]
+                  :access-control-allow-methods [:get :put :post :delete]
+                  :access-control-allow-credentials ["true"])))
 
 (defn -main []
   (println "Server started...")
-;;  (start-router)
+  (start-websocket)
+ (start-router)
         (run-server #'my-app {:join? false :port 8080}))

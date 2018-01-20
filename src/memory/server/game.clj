@@ -18,6 +18,9 @@
   (dec id)
   (inc id)))
 
+(defn match? [card-one card-two]
+ (= card-two (get-sibling-of-card card-one)))
+
 (defn create-game-id []
   (digest/md5
     repeatedly 8 #(rand-int 1000)))

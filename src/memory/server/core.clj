@@ -11,11 +11,16 @@
 (declare channel-socket)
 (defmulti event :id)
 
+(defn broadcast []
+  (doseq [uid (:any @(:connected-uids channel-socket))]
+    ((:send-fn channel-socket) uid [:test-push/hello "Hello!"])))
+
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
 
-(defmethod event :test/id1 [{:as ev-msg :keys [event uid ?data]}]
-  (println "Hello: " uid ?data))
+(defmethod event :test/id1 [{:as ev-msg :keys [event uid client-id ?data]}]
+  (println "Hello: " uid client-id ?data)
+  (broadcast))
 
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
     (println "New connection:" uid client-id))
@@ -25,10 +30,15 @@
 
 (defmethod event :chsk/ws-ping [_])
 
+;; currently client-id and uid are the same
+(defn create-user-id [{:keys [params]}]
+  (:client-id params))
+
 (defn start-websocket []
   (defonce channel-socket
     (sente/make-channel-socket!
-            (get-sch-adapter))))
+            (get-sch-adapter)
+            {:user-id-fn create-user-id})))
 
 (compojure/defroutes routes
     ; (compojure/GET "/status" req (str "Running: " (pr-str @(:connected-uids channel-socket))))
@@ -49,7 +59,7 @@
                   :access-control-allow-credentials ["true"])))
 
 (defn -main []
-  (println "Server started...")
-  (start-websocket)
- (start-router)
+  (println "Server starting...")
+    (start-websocket)
+    (start-router)
         (run-server #'my-app {:join? false :port 8080}))

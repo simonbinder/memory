@@ -31,6 +31,9 @@
     (println "Channel socket successfully established!")
     (println "Channel socket state change:" ?data)))
 
+(defmethod event-msg-handler :chsk/recv [{:as ev-msg :keys [?data]}]
+      (println ?data))
+
 (defn send-hello []
   (chsk-send! [:test/id1 {:hello "hello"}]))
 

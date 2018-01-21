@@ -1,0 +1,61 @@
+Objekt Spielstand:
+- Spieler 1
+  - resolvedPairs: alle aufgedeckte IDs
+- Spieler 2
+  - resolvedPairs: alle aufgedeckte IDs
+- Link
+- closedCards: Map von Karten (ID: Karte), Karte immer doppelt (wegen Paaren), SHUFFLED
+- activateUser
+  - openCards 
+------------------------------------------
+User erstellt Game clientseitig
+
+Unser Deck hat:
+- 36 Karten
+- Bilder
+
+Client:
+Event createGame()
+
+Server:
+- erhält Event createGame
+ --> registriert User1
+ --> erstellt Spiel mit Link
+ --> Spielobjekt erstellen (siehe oben)
+ --> sendet Link an Client
+
+
+**(2 mal) ------------->>>>>>>>>>**
+
+Client follows link:
+  --> RequestGameSetupEvent
+
+Server
+  --> RequestGameSetupEvent handlen:
+  ----> user registrieren
+  ----> geshuffeltes Deck an Client mit gameSetupEvent
+  
+ Client 
+  --> erhält GameSetupEvent mit Spielfeld
+  --> Spielfeld wird gerendert, entsprechend der Reihenfolge
+  --> noch keine Aktionen möglich
+
+** <<<<<<<-------------**
+
+Server:
+- erhält registerUser, das User2 registriert
+  --> Broadcast startGame()
+  --> Event activateUser(), ein User wird gewählt, der beginnt, daraufhin abwechselnd
+
+Client:
+- User clickt auf Karte
+  --> Event selectCard()
+
+Server:
+- erste Karte:
+  --> Event an beide User openCard()
+- zweite Karte:
+ --> Auflösung und grafisches Feedback, welcher User es gelöst hat (Counter?) openCard()
+ --> Event changeActiveUser()
+
+ --> wenn alle Paare gelöst sind, Spiel beenden Broadcast endGame()

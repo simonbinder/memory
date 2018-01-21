@@ -4,19 +4,24 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  
-  
+
+
   :min-lein-version "2.7.1"
 
   :dependencies [[org.clojure/clojure "1.9.0-beta4"]
                  [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/core.async  "0.3.443"]
-                 [reagent "0.7.0"]]
+                 [reagent "0.7.0"]
+                 [com.taoensso/sente "1.12.0"]
+                 [compojure "1.6.0"]
+                 [ring/ring-defaults "0.3.1"]]
 
   :plugins [[lein-figwheel "0.5.14"]
             [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]]
 
   :source-paths ["src"]
+
+  :main memory.server.core
 
   :cljsbuild {:builds
               [{:id "dev"
@@ -25,14 +30,14 @@
                 ;; The presence of a :figwheel configuration here
                 ;; will cause figwheel to inject the figwheel client
                 ;; into your build
-                :figwheel {:on-jsload "memory.core/on-js-reload"
+                :figwheel {:on-jsload "memory.client.core/on-js-reload"
                            ;; :open-urls will pop open your application
                            ;; in the default browser once Figwheel has
                            ;; started and compiled your application.
                            ;; Comment this out once it no longer serves you.
                            :open-urls ["http://localhost:3449/index.html"]}
 
-                :compiler {:main memory.core
+                :compiler {:main memory.client.core
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/compiled/memory.js"
                            :output-dir "resources/public/js/compiled/out"
@@ -46,7 +51,7 @@
                {:id "min"
                 :source-paths ["src"]
                 :compiler {:output-to "resources/public/js/compiled/memory.js"
-                           :main memory.core
+                           :main memory.client.core
                            :optimizations :advanced
                            :pretty-print false}}]}
 
@@ -65,7 +70,7 @@
 
              ;; doesn't work for you just run your own server :) (see lein-ring)
 
-             ;; :ring-handler hello_world.server/handler
+             ;;:ring-handler src.memory.server.core/my-app
 
              ;; To be able to open files in your editor from the heads up display
              ;; you will need to put a script on your path.

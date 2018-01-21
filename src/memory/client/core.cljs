@@ -1,5 +1,7 @@
-(ns memory.core
-    (:require [reagent.core :as reagent :refer [atom]]))
+(ns memory.client.core
+    (:require
+      [reagent.core :as reagent :refer [atom]]
+      [memory.client.communication :as communication]))
 
 (enable-console-print!)
 
@@ -13,7 +15,11 @@
 (defn hello-world []
   [:div
    [:h1 (:text @app-state)]
-   [:h3 "Edit this and watch it change!"]])
+   [:h3 "Edit this and test!"]
+   [:input  {:type "button" :value "Click me"
+            :on-click
+            (fn [e]
+              (communication/send-hello))}]])
 
 (reagent/render-component [hello-world]
                           (. js/document (getElementById "app")))

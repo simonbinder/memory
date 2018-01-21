@@ -31,8 +31,13 @@
     (println "Channel socket successfully established!")
     (println "Channel socket state change:" ?data)))
 
-(defmethod event-msg-handler :chsk/recv [{:as ev-msg :keys [?data]}]
-      (println ?data))
+(defmethod event-msg-handler :chsk/recv
+  ;; default custom push event. Unwraps the true message that, for
+  ;; now, comes wrapped in sente.
+  [{:as ev-msg :keys [?data]}]
+  (let [[message-type message-payload] ?data]
+    (if (= message-type :test-push/hello)
+    (println ?data))))
 
 (defn send-hello []
   (chsk-send! [:test/id1 {:hello "hello"}]))

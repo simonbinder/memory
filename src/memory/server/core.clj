@@ -15,12 +15,18 @@
   (doseq [uid (:any @(:connected-uids channel-socket))]
     ((:send-fn channel-socket) uid [:test-push/hello "Hello!"])))
 
+;; Just added for testing
+(defn broadcast-2 []
+    (doseq [uid (:any @(:connected-uids channel-socket))]
+      ((:send-fn channel-socket) uid [:test-push/bye "Bye!"])))
+
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
 
 (defmethod event :test/id1 [{:as ev-msg :keys [event uid client-id ?data]}]
   (println "Hello: " uid client-id ?data)
-  (broadcast))
+  (broadcast)
+  (broadcast-2))
 
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
     (println "New connection:" uid client-id))

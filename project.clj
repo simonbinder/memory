@@ -17,11 +17,13 @@
                  [ring/ring-defaults "0.3.1"]]
 
   :plugins [[lein-figwheel "0.5.14"]
-            [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]]
+            [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]
+            [lein-ring "0.9.7"]]
 
   :source-paths ["src"]
 
   :main memory.server.core
+  :ring {:handler memory.server.core/my-app}
 
   :cljsbuild {:builds
               [{:id "dev"

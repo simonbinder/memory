@@ -1,32 +1,33 @@
 (ns memory.server.core
   (:use org.httpkit.server)
   (:require
-  [taoensso.sente :as sente]
-  [compojure.core :as compojure]
-  [ring.middleware.cors :as cors]
-  [ring.middleware.params :refer [wrap-params]]
-  [ring.middleware.keyword-params :refer [wrap-keyword-params]]
-  [taoensso.sente.server-adapters.http-kit      :refer (get-sch-adapter)]))
+   [taoensso.sente :as sente]
+   [compojure.core :as compojure]
+   [ring.middleware.cors :as cors]
+   [ring.middleware.params :refer [wrap-params]]
+   [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+   [ring.util.response :as response]
+   [taoensso.sente.server-adapters.http-kit      :refer (get-sch-adapter)]))
 
   ;; currently client-id and uid are the same
-  (defn create-user-id [{:keys [params]}]
-    (:client-id params))
+(defn create-user-id [{:keys [params]}]
+  (:client-id params))
 
-  (let [packer :edn
-          chsk-server
-          (sente/make-channel-socket-server!
-                     (get-sch-adapter) {:packer packer :user-id-fn create-user-id})
+(let [packer :edn
+        chsk-server
+        (sente/make-channel-socket-server!
+                   (get-sch-adapter) {:packer packer :user-id-fn create-user-id})
 
-          {:keys [ch-recv send-fn connected-uids
-                  ajax-post-fn ajax-get-or-ws-handshake-fn]}
-                chsk-server]
+        {:keys [ch-recv send-fn connected-uids
+                ajax-post-fn ajax-get-or-ws-handshake-fn]}
+        chsk-server]
 
-          (def ring-ajax-post                ajax-post-fn)
-          (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-          (def ch-chsk                       ch-recv) ; ChannelSocket's receive channel
-          (def chsk-send!                    send-fn) ; ChannelSocket's send API fn
-          (def connected-uids                connected-uids) ; Watchable, read-only atom
-  )
+     (def ring-ajax-post                ajax-post-fn)
+     (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
+     (def ch-chsk                       ch-recv) ; ChannelSocket's receive channel
+     (def chsk-send!                    send-fn) ; ChannelSocket's send API fn
+     (def connected-uids                connected-uids)) ; Watchable, read-only atom
+
 
 (defmulti event :id)
 
@@ -45,15 +46,16 @@
 ;; ctrl , then shift b
 (defmethod event :test/id1 [{:as ev-msg :keys [event uid client-id ?data]}]
   (println "Hello from User: " uid client-id ?data)
-   (broadcast)
-   (broadcast-2)
-  )
+  (broadcast)
+  (broadcast-2))
+
 
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
     (println "New connection:" uid client-id))
 
 (defmethod event :chsk/uidport-close [{:keys [uid]}]
       (println "Disconnected:" uid))
+
 
 (defmethod event :chsk/ws-ping [_])
 
@@ -75,7 +77,8 @@
                   :access-control-allow-methods [:get :put :post :delete]
                   :access-control-allow-credentials ["true"])))
 
+
 (defn -main []
   (println "Server starting...")
-    (start-router)
-        (run-server #'my-app {:join? false :port 8080}))
+  (start-router)
+  (run-server #'my-app {:join? false :port 8080}))

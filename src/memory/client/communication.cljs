@@ -3,8 +3,8 @@
    [cljs.core.async.macros :as asyncm :refer (go go-loop)])
   (:require
    [cljs.core.async :as async :refer (<! >! put! chan)]
-   [taoensso.sente  :as sente :refer (cb-success?)]
-  ))
+   [taoensso.sente  :as sente :refer (cb-success?)]))
+
 
 (defn get-chsk-url
     "Connect to a configured server instead of the page host"
@@ -15,7 +15,7 @@
 
 (defonce channel-socket
     (with-redefs [sente/get-chsk-url get-chsk-url]
-    (sente/make-channel-socket! "/chsk" {:type :auto})))
+     (sente/make-channel-socket! "/chsk" {:type :auto})))
 (defonce chsk (:chsk channel-socket))
 (defonce ch-chsk (:ch-recv channel-socket))
 (defonce chsk-send! (:send-fn channel-socket))
@@ -37,7 +37,7 @@
   [{:as ev-msg :keys [?data]}]
   (let [[message-type message-payload] ?data]
     (if (= message-type :test-push/hello)
-    (println ?data))))
+     (println ?data))))
 
 (defn send-hello []
   (chsk-send! [:test/id1 {:hello "hello"}]))

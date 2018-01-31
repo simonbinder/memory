@@ -2,6 +2,4 @@
 
 (def games (atom (hash-map)))
 
-(defn add-new-game [game]
-
-)
+(defn add-new-game [game])

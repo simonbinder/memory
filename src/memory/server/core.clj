@@ -1,6 +1,7 @@
 (ns memory.server.core
   (:use org.httpkit.server)
   (:require
+    [memory.server.game :as game]
    [taoensso.sente :as sente]
    [compojure.core :as compojure]
    [ring.middleware.cors :as cors]
@@ -39,14 +40,15 @@
 
 (defmulti event :id)
 
-(defmethod event :game/createGame [{:as ev-msg :keys [event uid client-id ?data]}]
-  (handle-create-game uid)
-)
-
 (defn handle-create-game [uid]
-   (game/createGame uid)
+  (println "Game: " (game/create-new-game uid)))
 
-)
+
+(defmethod event :game/create-game [{:as ev-msg :keys [event uid client-id ?data]}]
+  (println "UserID:" uid)
+  (handle-create-game uid))
+
+
 
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))

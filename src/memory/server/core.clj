@@ -28,9 +28,6 @@
      (def chsk-send!                    send-fn) ; ChannelSocket's send API fn
      (def connected-uids                connected-uids)) ; Watchable, read-only atom
 
-
-(defmulti event :id)
-
 (defn broadcast []
   (doseq [uid (:any @connected-uids)]
     (chsk-send! uid [:test-push/hello "Hello Test!"])))
@@ -39,6 +36,17 @@
 (defn broadcast-2 []
     (doseq [uid (:any @connected-uids)]
       (chsk-send! uid [:test-push/bye "Bye!"])))
+
+(defmulti event :id)
+
+(defmethod event :game/createGame [{:as ev-msg :keys [event uid client-id ?data]}]
+  (handle-create-game uid)
+)
+
+(defn handle-create-game [uid]
+   (game/createGame uid)
+
+)
 
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))

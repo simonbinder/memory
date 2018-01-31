@@ -1,14 +1,14 @@
 (ns memory.server.game)
 (require 'digest)
 
-(defn createNewGame [game-id players]
+(defn createNewGame [player-one-uid]
   {
    :id (create-game-id)
    :player-one {
-                :player (:player-one players)
+                :player player-one-uid
                 :resolved-pairs (list)}
    :player-two {
-                :player (:player-two players)
+                :player nil
                 :resolved-pairs (list)}
    :closed-cards (take 36 (iterate inc 0))
    :active-user (rand-int 1)})

@@ -2,6 +2,7 @@
   (:use org.httpkit.server)
   (:require
     [memory.server.game :as game]
+    [memory.server.games :as games]
    [taoensso.sente :as sente]
    [compojure.core :as compojure]
    [ring.middleware.cors :as cors]
@@ -41,14 +42,10 @@
 (defmulti event :id)
 
 (defn handle-create-game [uid]
-  (println "Game: " (game/create-new-game uid)))
-
+    (games/add-new-game uid))
 
 (defmethod event :game/create-game [{:as ev-msg :keys [event uid client-id ?data]}]
-  (println "UserID:" uid)
   (handle-create-game uid))
-
-
 
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
@@ -59,13 +56,11 @@
   (broadcast)
   (broadcast-2))
 
-
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
     (println "New connection:" uid client-id))
 
 (defmethod event :chsk/uidport-close [{:keys [uid]}]
       (println "Disconnected:" uid))
-
 
 (defmethod event :chsk/ws-ping [_])
 

@@ -1,7 +1,7 @@
 (ns memory.server.game)
 (require 'digest)
 
-;; too long?
+;; too long TODO: not random - same value always generates same id?
 (defn create-game-id [uid]
   (digest/md5 uid))
 

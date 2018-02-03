@@ -21,6 +21,10 @@
     (?reply-fn (let [game-id (eventhandler/create-game uid)]
       {:game-id game-id} ))))
 
+(defmethod event :game/join-game [{:as ev-msg :keys [event uid client-id ?data ]}]
+  (join-game-handler [uid (:game-id ?data)]))
+
+
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
 

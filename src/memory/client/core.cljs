@@ -7,16 +7,26 @@
 
 (defonce app-state (atom {:text "Hello world!"}))
 
+(defn create-game[]
+  [:div [:input  {:type "button" :value "Create Game"
+  :on-click
+  (fn [e]
+    (communication/create-game))}]])
+
 (defn hello-world []
   [:div
    [:h1 (:text @app-state)]
    [:h3 "Edit this and test!"]
-   [:form
-     [:input {:type "text"}]
-     [:input  {:type "button" :value "Click me"
-               :on-click
-               (fn [e]
-                 (communication/send-hello))}]]])
+    [create-game]])
+
+
+
+
+
+
+
+
+
 
 (reagent/render-component [hello-world]
                           (. js/document (getElementById "app")))

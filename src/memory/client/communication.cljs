@@ -42,6 +42,11 @@
 (defn send-hello []
   (chsk-send! [:test/id1 {:hello "hello"}]))
 
+(defn print-reply [reply] (println reply))
+
+(defn create-game[]
+  (chsk-send! [:game/create-game {:game "game"}] 8000 print-reply))
+
 (defmethod event-msg-handler :chsk/handshake [{:as ev-msg :keys [?data]}]
     (let [[?uid ?csrf-token ?handshake-data] ?data]
       (println "Handshake:" ?data)))

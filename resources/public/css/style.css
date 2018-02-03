@@ -1,2 +1,12 @@
 /* some style */
 
+li {
+  background-color: green;
+  width: 120px;
+  height: 70px;
+  float: left;
+  margin: 10px;
+  text-align: center;
+  padding-top: 50px;
+  list-style: none;
+}

@@ -1,6 +1,8 @@
 (ns memory.server.core
   (:use org.httpkit.server)
   (:require
+    [memory.server.game :as game]
+    [memory.server.games :as games]
    [taoensso.sente :as sente]
    [compojure.core :as compojure]
    [ring.middleware.cors :as cors]
@@ -28,9 +30,6 @@
      (def chsk-send!                    send-fn) ; ChannelSocket's send API fn
      (def connected-uids                connected-uids)) ; Watchable, read-only atom
 
-
-(defmulti event :id)
-
 (defn broadcast []
   (doseq [uid (:any @connected-uids)]
     (chsk-send! uid [:test-push/hello "Hello Test!"])))
@@ -40,22 +39,29 @@
     (doseq [uid (:any @connected-uids)]
       (chsk-send! uid [:test-push/bye "Bye!"])))
 
+
+(defmulti event :id)
+
+(defn handle-create-game [uid]
+    (games/add-new-game uid))
+
+(defmethod event :game/create-game [{:as ev-msg :keys [event uid client-id ?data]}]
+  (def game (handle-create-game uid))
+  (println "Game: " game))
+
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
 
 ;; ctrl , then shift b
 (defmethod event :test/id1 [{:as ev-msg :keys [event uid client-id ?data]}]
   (println "Hello from User: " uid client-id ?data)
-  (broadcast)
-  (broadcast-2))
-
+  (broadcast))
 
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
     (println "New connection:" uid client-id))
 
 (defmethod event :chsk/uidport-close [{:keys [uid]}]
       (println "Disconnected:" uid))
-
 
 (defmethod event :chsk/ws-ping [_])
 

@@ -1,14 +1,18 @@
 (ns memory.server.game)
 (require 'digest)
 
-(defn createNewGame [game-id players]
+;; too long TODO: not random - same value always generates same id?
+(defn create-game-id [uid]
+  (digest/md5 uid))
+
+(defn create-new-game [player-one-uid]
   {
-   :id (create-game-id)
+   :id (create-game-id player-one-uid)
    :player-one {
-                :player (:player-one players)
+                :player player-one-uid
                 :resolved-pairs (list)}
    :player-two {
-                :player (:player-two players)
+                :player nil
                 :resolved-pairs (list)}
    :closed-cards (take 36 (iterate inc 0))
    :active-user (rand-int 1)})
@@ -20,7 +24,3 @@
 
 (defn match? [card-one card-two]
  (= card-two (get-sibling-of-card card-one)))
-
-(defn create-game-id []
-  (digest/md5
-    repeatedly 8 #(rand-int 1000)))

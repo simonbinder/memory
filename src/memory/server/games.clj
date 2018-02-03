@@ -14,5 +14,5 @@
   (let [game-id (create-game-id uid) game (game/create-new-game uid)]
     (swap! games assoc-in [game-id] game)
     (swap! users assoc-in [uid] game-id)
-    game
+    {:game-id game-id :game game}
    ))

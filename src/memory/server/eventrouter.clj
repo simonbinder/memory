@@ -18,9 +18,8 @@
 
 (defmethod event :game/create-game [{:as ev-msg :keys [event uid client-id ?data ?reply-fn]}]
   (when ?reply-fn
-    (?reply-fn (let [game (eventhandler/create-game uid)
-                    {:keys [game-id game]} game]
-                      {:game-id game-id :deck (:closed-cards game)}))))
+    (?reply-fn (let [game-id (eventhandler/create-game uid)]
+      {:game-id game-id} ))))
 
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))

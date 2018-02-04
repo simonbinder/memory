@@ -1,8 +1,16 @@
 (ns memory.server.game)
 (use 'clojure.walk)
-(require 'digest)
+(require 'digest '[clojure.java.io :as io])
 
-(def deck '("../../assets/pinkfloyd.png" "../../assets/andy-warhol-banana.png" "../../assets/the-xx.jpg"))
+; (def deck '("../../assets/pinkfloyd.png" "../../assets/andy-warhol-banana.png" "../../assets/the-xx.jpg" "../../assets/default_cover"))
+(defn load-deck-files[]
+  (def directory (clojure.java.io/file  "./resources/public/assets"))
+  (def files
+    (for [file (file-seq directory)] (.getPath file)))
+  (println "Files: " files)
+  files)
+
+(def deck (load-deck-files))
 
 ;; too long TODO: not random - same value always generates same id?
 (defn create-game-id [uid]

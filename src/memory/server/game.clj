@@ -1,9 +1,20 @@
 (ns memory.server.game)
+(use 'clojure.walk)
 (require 'digest)
+
+(def deck '("../../assets/pinkfloyd.png" "../../assets/andy-warhol-banana.png" "../../assets/the-xx.jpg"))
 
 ;; too long TODO: not random - same value always generates same id?
 (defn create-game-id [uid]
   (digest/md5 uid))
+
+(defn generate-id[]
+   (def ids (take 36 (iterate inc 0)))
+   ids)
+
+(defn create-deck[]
+  (def closed-cards (apply assoc {} (interleave (generate-id) deck)))
+  closed-cards)
 
 (defn create-new-game [player-one-uid]
   {
@@ -14,7 +25,7 @@
    :player-two {
                 :player nil
                 :resolved-pairs (list)}
-   :closed-cards (take 36 (iterate inc 0))
+   :closed-cards (create-deck)
    :active-user (rand-int 1)})
 
 (defn get-sibling-of-card [id]

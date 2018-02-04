@@ -17,16 +17,8 @@
   [:div
    [:h1 (:text @app-state)]
    [:h3 "Edit this and test!"]
+   [:img {:src "../../assets/pinkfloyd.png"}]
     [create-game]])
-
-
-
-
-
-
-
-
-
 
 (reagent/render-component [hello-world]
                           (. js/document (getElementById "app")))

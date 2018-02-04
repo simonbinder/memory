@@ -13,11 +13,33 @@
   (fn [e]
     (communication/create-game))}]])
 
+
+
+(defn join-game []
+  (let [game-id (atom nil)] (fn []
+  [:div "Join Game"
+    [:form
+       [:input {:value @game-id
+               :type "text"
+               :on-change #(reset! game-id (-> % .-target .-value))}]
+       [:button {:type "button"
+                :name "join"
+                :onClick #(communication/join-game @game-id)}
+                "Join Game!"]]
+     [:div @game-id]]
+ )))
+
+
+(defn game-id-input
+  []
+  [:div])
+
 (defn hello-world []
   [:div
    [:h1 (:text @app-state)]
    [:h3 "Edit this and test!"]
-    [create-game]])
+    [create-game]
+    [join-game]])
 
 
 

@@ -47,6 +47,9 @@
 (defn create-game[]
   (chsk-send! [:game/create-game {:game "game"}] 8000 print-reply))
 
+(defn join-game [game-id]
+  (chsk-send! [:game/join-game {:game-id game-id}]))
+
 (defmethod event-msg-handler :chsk/handshake [{:as ev-msg :keys [?data]}]
     (let [[?uid ?csrf-token ?handshake-data] ?data]
       (println "Handshake:" ?data)))

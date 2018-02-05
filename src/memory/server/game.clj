@@ -6,9 +6,12 @@
 (defn load-deck-files[]
   (def directory (clojure.java.io/file  "./resources/public/assets"))
   (def files
-    (for [file (file-seq directory)] (.getPath file)))
-  (println "Files: " files)
-  files)
+    (for [file (file-seq directory)]
+    (when (.isFile file)
+      (.getPath file))))
+  (def files-clean (remove nil? files))
+  (println "Files: " files-clean)
+  files-clean)
 
 (def deck (load-deck-files))
 
@@ -16,12 +19,15 @@
 (defn create-game-id [uid]
   (digest/md5 uid))
 
-(defn generate-id[]
-   (def ids (take 36 (iterate inc 0)))
+(defn generate-id[start-value]
+   (def ids (take 18 (iterate (partial + 2) start-value)))
    ids)
 
+;; TODO: shuffle
 (defn create-deck[]
-  (def closed-cards (apply assoc {} (interleave (generate-id) deck)))
+  (def closed-cards-1 (apply assoc {} (interleave (generate-id 0) deck)))
+  (def closed-cards-2 (apply assoc {} (interleave (generate-id 1) deck)))
+  (def closed-cards (merge closed-cards-1 closed-cards-2))
   closed-cards)
 
 (defn create-new-game [player-one-uid]

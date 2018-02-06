@@ -3,9 +3,9 @@
       [reagent.core :as reagent :refer [atom]]))
 
 (defn card-item-open []
-  (fn [{:keys [title, turned]}]
+  (fn [{:keys [title, turned, src]}]
     [:li
-      [:img {:src "http://media.einfachtierisch.de/thumbnail/600/0/media.einfachtierisch.de/images/2013/01/Junge-Katze-Erziehen.jpg"}]]))
+      [:img {:src src}]]))
 
 (defn card-item-closed []
   (fn [{:keys [title, turned]}]

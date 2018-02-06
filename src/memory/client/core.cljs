@@ -12,11 +12,11 @@
 (defonce cards (atom
   { 1 {:id 1 :title "Card1" :turned true}
     2 {:id 2 :title "Card2" :turned true}
-    3 {:id 3 :title "Card3" :turned true}
+    3 {:id 3 :title "Card3" :turned false}
     4 {:id 4 :title "Card4" :turned true}
     5 {:id 5 :title "Card5" :turned true}
     6 {:id 6 :title "Card6" :turned true}
-    7 {:id 7 :title "Card7" :turned true}
+    7 {:id 7 :title "Card7" :turned false}
     8 {:id 8 :title "Card8" :turned true}
     9 {:id 9 :title "Card9" :turned true}
     10 {:id 10 :title "Card10" :turned true}

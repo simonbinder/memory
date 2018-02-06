@@ -2,17 +2,24 @@
     (:require
       [reagent.core :as reagent :refer [atom]]))
 
-(defn card-item []
-  (fn [{:keys [title]}]
+(defn card-item-open []
+  (fn [{:keys [title, turned]}]
     [:li title]))
+
+(defn card-item-closed []
+  (fn [{:keys [title, turned]}]
+    [:li ]))
+
+(defn card-item [card]
+  (fn [{:keys [title, turned]}]
+    (if (true? turned)
+      [card-item-open card]
+      [card-item-closed]
+      )))
 
 (defn gameboard [cards]
     (let [items @cards]
-      (print items)
       [:div#gameboard
         [:ul#card-list {:style {:width "600px"}}
           (for [card items]
               ^{:key (:id (val card))} [card-item (val card)])]]))
-
-;;(reagent/render-component [memory-app])
-  ;;  (. js/document (getElementById "app")))

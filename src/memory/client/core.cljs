@@ -10,22 +10,23 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 (defonce cards (atom
-  { :0 "Card1"
-    :1 "Card2"
-    :2 "Card3"
-    :3 "Card4"
-    :4 "Card5"
-    :5 "Card6"
-    :6 "Card7"
-    :7 "Card8"
-    :8 "Card9"
-    :9 "Card10"
-    :10 "Card11"
-    :11 "Card12"
-    :12 "Card13"
-    :13 "Card14"
-    :14 "Card15"
-    :15 "Card16" }))
+  { 1 {:id 1 :title "Card1" :turned true}
+    2 {:id 2 :title "Card2" :turned true}
+    3 {:id 3 :title "Card3" :turned true}
+    4 {:id 4 :title "Card4" :turned true}
+    5 {:id 5 :title "Card5" :turned true}
+    6 {:id 6 :title "Card6" :turned true}
+    7 {:id 7 :title "Card7" :turned true}
+    8 {:id 8 :title "Card8" :turned true}
+    9 {:id 9 :title "Card9" :turned true}
+    10 {:id 10 :title "Card10" :turned true}
+    11 {:id 11 :title "Card11" :turned true}
+    12 {:id 12 :title "Card12" :turned true}
+    13 {:id 13 :title "Card13" :turned true}
+    14 {:id 14 :title "Card14" :turned true}
+    15 {:id 15 :title "Card15" :turned true}
+    16 {:id 16 :title "Card16" :turned true}
+  }))
 
 (defonce app-state (atom {:text "Hello world!"}))
 

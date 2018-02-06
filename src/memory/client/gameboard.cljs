@@ -4,7 +4,8 @@
 
 (defn card-item-open []
   (fn [{:keys [title, turned]}]
-    [:li title]))
+    [:li
+      [:img {:src "http://media.einfachtierisch.de/thumbnail/600/0/media.einfachtierisch.de/images/2013/01/Junge-Katze-Erziehen.jpg"}]]))
 
 (defn card-item-closed []
   (fn [{:keys [title, turned]}]

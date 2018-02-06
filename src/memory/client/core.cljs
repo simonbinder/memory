@@ -9,38 +9,25 @@
 (println "This text is printed from src/memory/core.cljs. Go ahead and edit it and see reloading in action.")
 
 ;; define your app data so that it doesn't get over-written on reload
+(defonce cards (atom
+  { :0 "Card1"
+    :1 "Card2"
+    :2 "Card3"
+    :3 "Card4"
+    :4 "Card5"
+    :5 "Card6"
+    :6 "Card7"
+    :7 "Card8"
+    :8 "Card9"
+    :9 "Card10"
+    :10 "Card11"
+    :11 "Card12"
+    :12 "Card13"
+    :13 "Card14"
+    :14 "Card15"
+    :15 "Card16" }))
 
 (defonce app-state (atom {:text "Hello world!"}))
-
-(defonce counter (atom 0))
-
-(defonce cards (atom (sorted-map)))
-
-(defn add-card [text]
-  (let [id (swap! counter inc)]
-    (swap! cards assoc id {:id id :title text :turned true})))
-
-(defn turn [id] (swap! cards update-in [id :turned] not))
-
-(defonce init
-  (do
-    (println "init")
-    (add-card "Card 1")
-    (add-card "Card 2")
-    (add-card "Card 3")
-    (add-card "Card 4")
-    (add-card "Card 5")
-    (add-card "Card 6")
-    (add-card "Card 7")
-    (add-card "Card 8")
-    (add-card "Card 9")
-    (add-card "Card 10")
-    (add-card "Card 11")
-    (add-card "Card 12")
-    (add-card "Card 13")
-    (add-card "Card 14")
-    (add-card "Card 15")
-    (add-card "Card 16")))
 
 (defn hello-world []
   [:div
@@ -50,7 +37,7 @@
             :on-click
             (fn [e]
               (communication/send-hello))}]
-              (gameboard/memory-app cards)
+              (gameboard/gameboard cards)
 
 ])
 

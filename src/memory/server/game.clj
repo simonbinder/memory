@@ -1,3 +1,4 @@
+(comment
 (ns memory.server.game)
 (use 'clojure.walk)
 (require 'digest '[clojure.java.io :as io])
@@ -47,3 +48,4 @@
 
 (defn match? [card-one card-two]
  (= card-two (get-sibling-of-card card-one)))
+)

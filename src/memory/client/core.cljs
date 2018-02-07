@@ -13,8 +13,6 @@
   (fn [e]
     (communication/create-game))}]])
 
-
-
 (defn join-game []
   (let [game-id (atom nil)] (fn []
   [:div "Join Game"
@@ -28,7 +26,6 @@
                 "Join Game!"]]
      [:div @game-id]]
  )))
-
 
 (defn game-id-input
   []

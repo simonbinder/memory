@@ -15,9 +15,6 @@
 
 (def deck (load-deck-files))
 
-;; too long TODO: not random - same value always generates same id?
-(defn create-game-id [uid]
-  (digest/md5 uid))
 
 (defn generate-id[start-value]
    (def ids (take 18 (iterate (partial + 2) start-value)))
@@ -32,12 +29,11 @@
 
 (defn create-new-game [player-one-uid]
   {
-   :id (create-game-id player-one-uid)
    :player-one {
-                :player player-one-uid
+                :uid player-one-uid
                 :resolved-pairs (list)}
    :player-two {
-                :player nil
+                :uid nil
                 :resolved-pairs (list)}
    :closed-cards (create-deck)
    :active-user (rand-int 1)})

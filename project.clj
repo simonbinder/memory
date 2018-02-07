@@ -14,7 +14,8 @@
                  [reagent "0.7.0"]
                  [com.taoensso/sente "1.12.0"]
                  [compojure "1.6.0"]
-                 [ring/ring-defaults "0.3.1"]]
+                 [ring/ring-defaults "0.3.1"]
+                 [re-frame "0.10.1"]]
 
   :plugins [[lein-figwheel "0.5.14"]
             [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]]

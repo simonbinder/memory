@@ -15,7 +15,7 @@
 
 (defn join-game-handler [uid game-id]
   ;; TODO ADD Error handling
-  (games/add-player-to-game uid game-id)
+  (let [game (games/add-player-to-game uid game-id)])
   (multicast-event-to-game [:notification/user-connected uid] game-id)
   ;;TODO Send deck?
   )

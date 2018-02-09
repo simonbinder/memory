@@ -78,5 +78,5 @@
   (defn ^:export run
     []
     (rf/dispatch-sync [:initialize])     ;; puts a value into application state
-    (reagent/render [gameboard]              ;; mount the application's ui into '<div id="app" />'
-                    (js/document.getElementById "app")))
+    (reagent/render-component [gameboard]              ;; mount the application's ui into '<div id="app" />'
+                    (. js/document (getElementById "app"))))

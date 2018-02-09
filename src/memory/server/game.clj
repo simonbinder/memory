@@ -27,7 +27,7 @@
 (defn create-new-game [player-one-uid]
   {
    :players {1 player-one-uid 2 nil}
-   :active-player player-one-uid
+   :active-player 1
    :deck (create-deck)})
 
 (defn get-sibling-of-card [id]

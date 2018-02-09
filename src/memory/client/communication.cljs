@@ -36,8 +36,8 @@
   ;; now, comes wrapped in sente.
   [{:as ev-msg :keys [?data]}]
   (let [[message-type message-payload] ?data]
-    (if (= message-type :test-push/hello)
-     (println ?data))))
+    ; (if (= message-type :test-push/hello)
+     (println ?data)))
 
 (defn send-hello []
   (chsk-send! [:test/id1 {:hello "hello"}]))
@@ -46,6 +46,9 @@
 
 (defn create-game[]
   (chsk-send! [:game/create-game {:game "game"}] 8000 print-reply))
+
+(defn join-game [game-id]
+  (chsk-send! [:game/join-game {:game-id game-id}]))
 
 (defmethod event-msg-handler :chsk/handshake [{:as ev-msg :keys [?data]}]
     (let [[?uid ?csrf-token ?handshake-data] ?data]

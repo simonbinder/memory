@@ -10,24 +10,28 @@
     (when (.isFile file)
       (.getPath file))))
   (def files-clean (remove nil? files))
+files-clean)
+
+(defn create-deck-vector[]
   (def deck-list
-    (for [file files-clean]
-      {:url file
+    (for [file (load-deck-files)]
+      { :id (str (java.util.UUID/randomUUID))
+        :url file
         :turned false
         :resolved 0}))
   (def deck-vector
-    (into [] files-map))
-  deck-vector)
+    (into [] deck-list))
+    deck-vector)
 
 (defn create-deck[]
-  (def deck (into [] (concat (load-deck-files) (load-deck-files))))
+  (def deck (into [] (concat (create-deck-vector) (create-deck-vector))))
   (def deck-shuffled (shuffle deck))
   deck-shuffled)
 
 (defn create-new-game [player-one-uid]
   {
    :players {1 player-one-uid 2 nil}
-   :active-player player-one-uid
+   :active-player 1
    :deck (create-deck)})
 
 (defn get-sibling-of-card [id]

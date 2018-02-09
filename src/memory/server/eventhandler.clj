@@ -13,6 +13,16 @@
 (defn create-game-handler [uid]
     (games/add-new-game uid))
 
+(defn filter-players [uid game-id]
+    (first (filter (comp #{uid}  (get (get @games/games game-id) :players))
+      (keys (get (get @games/games game-id) :players)))))
+
+(defn player-disconnected [uid]
+  (def game-id (get @games/users uid))
+  (def player-index (filter-players uid game-id))
+  (swap! games/games assoc-in [game-id :players player-index] nil)
+ (swap! games/users dissoc uid))
+
 (defn join-game-handler [uid game-id]
   ;; TODO ADD Error handling
   (games/add-player-to-game uid game-id)

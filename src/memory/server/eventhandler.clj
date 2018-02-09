@@ -18,3 +18,10 @@
   (games/add-player-to-game uid game-id)
   (def game (get @games/games game-id))
   (multicast-event-to-game :game/send-game-data game-id))
+
+
+;; For testing demo
+
+(defn four [] 4)
+(defn match [[card-one card-two]]
+   (= (:value card-one) (:value card-two)))

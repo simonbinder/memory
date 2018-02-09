@@ -10,33 +10,25 @@
     (when (.isFile file)
       (.getPath file))))
   (def files-clean (remove nil? files))
-  (println "Files: " files-clean)
-  files-clean)
+  (def deck-list
+    (for [file files-clean]
+      {:url file
+        :turned false
+        :resolved 0}))
+  (def deck-vector
+    (into [] files-map))
+  deck-vector)
 
-(def deck (load-deck-files))
-
-
-(defn generate-id[start-value]
-   (def ids (take 18 (iterate (partial + 2) start-value)))
-   ids)
-
-;; TODO: shuffle
 (defn create-deck[]
-  (def closed-cards-1 (apply assoc {} (interleave (generate-id 0) deck)))
-  (def closed-cards-2 (apply assoc {} (interleave (generate-id 1) deck)))
-  (def closed-cards (merge closed-cards-1 closed-cards-2))
-  closed-cards)
+  (def deck (into [] (concat (load-deck-files) (load-deck-files))))
+  (def deck-shuffled (shuffle deck))
+  deck-shuffled)
 
 (defn create-new-game [player-one-uid]
   {
-   :player-one {
-                :uid player-one-uid
-                :resolved-pairs (list)}
-   :player-two {
-                :uid nil
-                :resolved-pairs (list)}
-   :closed-cards (create-deck)
-   :active-user (rand-int 1)})
+   :players {1 player-one-uid 2 nil}
+   :active-player player-one-uid
+   :deck (create-deck)})
 
 (defn get-sibling-of-card [id]
  (if (odd?)

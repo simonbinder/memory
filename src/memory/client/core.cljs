@@ -87,8 +87,7 @@
        [:div#gameboard
          [:ul#card-list {:style {:width "600px"}}
            (for [card items]
-               ^{:key (:id (val card))} [card-item (val card)])]])
-               [join-game])
+               ^{:key (:id (val card))} [card-item (val card)])]]))
 
   ;; -- Entry Point -------------------------------------------------------------
 

@@ -43,7 +43,11 @@ files-clean)
       deck-shuffled)
 
 (defn player-nil? [player-key game-id]
-  (nil? (first (vals(select-keys (get (get @games game-id) :players) [player-key])))))
+  (nil? (first
+    (vals (select-keys
+        (get (get @games game-id)
+        :players)
+        [player-key])))))
 
 (defn add-player-to-game [uid game-id]
   (if (nil? (get @games game-id))
@@ -52,7 +56,7 @@ files-clean)
       ((swap! games assoc-in [game-id :players 1] uid)
       (swap! users assoc-in [uid] game-id))
       (if (player-nil? 2 game-id)
-        ((swap! games assoc-in [game-id :players 2] uid)s
+        ((swap! games assoc-in [game-id :players 2] uid)
          (swap! users assoc-in [uid] game-id))
          (throw (Exception. "There are already two players participating in this game."))))))
 

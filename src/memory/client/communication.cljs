@@ -36,8 +36,8 @@
   ;; now, comes wrapped in sente.
   [{:as ev-msg :keys [?data]}]
   (let [[message-type message-payload] ?data]
-    (if (= message-type :test-push/hello)
-     (println ?data))))
+    ; (if (= message-type :test-push/hello)
+     (println ?data)))
 
 (defn send-hello []
   (chsk-send! [:test/id1 {:hello "hello"}]))

@@ -11,33 +11,29 @@
     (when (.isFile file)
       (.getPath file))))
   (def files-clean (remove nil? files))
-  (println "Files: " files-clean)
-  files-clean)
+files-clean)
 
-(def deck (load-deck-files))
+(defn create-deck-vector[]
+  (def deck-list
+    (for [file (load-deck-files)]
+      { :id (str (java.util.UUID/randomUUID))
+        :url file
+        :turned false
+        :resolved 0}))
+  (def deck-vector
+    (into [] deck-list))
+    deck-vector)
 
-
-(defn generate-id[start-value]
-   (def ids (take 18 (iterate (partial + 2) start-value)))
-   ids)
-
-;; TODO: shuffle
 (defn create-deck[]
-  (def closed-cards-1 (apply assoc {} (interleave (generate-id 0) deck)))
-  (def closed-cards-2 (apply assoc {} (interleave (generate-id 1) deck)))
-  (def closed-cards (merge closed-cards-1 closed-cards-2))
-  closed-cards)
+  (def deck (into [] (concat (create-deck-vector) (create-deck-vector))))
+  (def deck-shuffled (shuffle deck))
+  deck-shuffled)
 
 (defn create-new-game [player-one-uid]
   {
-   :player-one {
-                :uid player-one-uid
-                :resolved-pairs (list)}
-   :player-two {
-                :uid nil
-                :resolved-pairs (list)}
-   :closed-cards (create-deck)
-   :active-user (rand-int 1)})
+   :players {1 player-one-uid 2 nil}
+   :active-player 1
+   :deck (create-deck)})
 
 
 

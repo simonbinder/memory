@@ -15,6 +15,7 @@
                  [com.taoensso/sente "1.12.0"]
                  [compojure "1.6.0"]
                  [ring/ring-defaults "0.3.1"]
+                 [re-frame "0.10.1"]
                  [digest "1.4.6"]]
 
   :plugins [[lein-figwheel "0.5.14"]
@@ -33,7 +34,7 @@
                 ;; The presence of a :figwheel configuration here
                 ;; will cause figwheel to inject the figwheel client
                 ;; into your build
-                :figwheel {:on-jsload "memory.client.core/on-js-reload"
+                :figwheel {:on-jsload "memory.client.core/run"
                            ;; :open-urls will pop open your application
                            ;; in the default browser once Figwheel has
                            ;; started and compiled your application.

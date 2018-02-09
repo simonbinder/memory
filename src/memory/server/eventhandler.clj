@@ -22,3 +22,7 @@
   (multicast-event-to-game [:game/player-selected (get-in game [:turn :selected-player])])
   ;; is this the second event necessary? Clients can read, who is activated.
   )
+
+(defn four [] 4)
+(defn match [[card-one card-two]]
+   (= (:value card-one) (:value card-two)))

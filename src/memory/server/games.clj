@@ -52,7 +52,7 @@ files-clean)
       ((swap! games assoc-in [game-id :players 1] uid)
       (swap! users assoc-in [uid] game-id))
       (if (player-nil? 2 game-id)
-        ((swap! games assoc-in [game-id :players 2] uid)s
+        ((swap! games assoc-in [game-id :players 2] uid)
          (swap! users assoc-in [uid] game-id))
          (throw (Exception. "There are already two players participating in this game."))))))
 

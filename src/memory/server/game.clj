@@ -16,7 +16,7 @@
         :turned false
         :resolved 0}))
   (def deck-vector
-    (into [] files-map))
+    (into [] deck-list))
   deck-vector)
 
 (defn create-deck[]

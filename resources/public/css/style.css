@@ -1,2 +1,17 @@
 /* some style */
 
+li {
+  background-color: green;
+  width: 120px;
+  height: 120px;
+  float: left;
+  margin: 10px;
+  text-align: center;
+  list-style: none;
+  overflow: hidden;
+}
+
+img {
+  height: 120px;
+  margin-left: -30px;
+}

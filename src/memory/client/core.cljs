@@ -1,5 +1,6 @@
 (ns memory.client.core
     (:require
+      [memory.client.communication :as communication]
       [reagent.core :as reagent]
       [re-frame.core :as rf]
       [clojure.string :as str]))
@@ -37,33 +38,7 @@
       (let [old-cards @(db :cards)
             old-card-turned (get (get old-cards id) :turned)]
           (assoc db :cards (atom (update-in old-cards [id] assoc :turned (not old-card-turned)))))))  ;; compute and return the new application state
-(defn join-game []
-  (let [game-id (atom nil)] (fn []
-  [:div "Join Game"
-    [:form
-       [:input {:value @game-id
-               :type "text"
-               :on-change #(reset! game-id (-> % .-target .-value))}]
-       [:button {:type "button"
-                :name "join"
-                :onClick #(communication/join-game @game-id)}
-                "Join Game!"]]
-     [:div @game-id]]
- )))
 
-(defn game-id-input
-  []
-  [:div])
-
-(defn hello-world []
-  [:div
-   [:h1 (:text @app-state)]
-   [:h3 "Edit this and test!"]
-   [:img {:src "../../assets/pinkfloyd.png"}]
-   [create-game]
-   [join-game]])
-(reagent/render-component [hello-world]
-                          (. js/document (getElementById "app")))
 
   ;(defn toggle [id] (swap! todos update-in [id :done] not))
 
@@ -93,12 +68,27 @@
        [card-item-closed card]
        )))
 
+  (defn join-game []
+         (let [game-id (atom nil)] (fn []
+         [:div "Join Game"
+           [:form
+              [:input {:value @game-id
+                      :type "text"
+                      :on-change #(reset! game-id (-> % .-target .-value))}]
+              [:button {:type "button"
+                       :name "join"
+                       :onClick #(communication/join-game @game-id)}
+                       "Join Game!"]]
+            [:div @game-id]]
+        )))
+
   (defn gameboard []
      (let [items @@(rf/subscribe [:cards])]
        [:div#gameboard
          [:ul#card-list {:style {:width "600px"}}
            (for [card items]
-               ^{:key (:id (val card))} [card-item (val card)])]]))
+               ^{:key (:id (val card))} [card-item (val card)])]])
+               [join-game])
 
   ;; -- Entry Point -------------------------------------------------------------
 

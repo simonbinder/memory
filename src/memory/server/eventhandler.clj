@@ -18,7 +18,7 @@
   (def game (games/add-player-to-game uid game-id))
   (multicast-event-to-game [:game/player-joined-game {
                                  :uid uid
-                                 :game game } game-id)
+                                 :game game } game-id])
   (multicast-event-to-game [:game/player-selected (get-in game [:turn :selected-player])])
   ;; is this the second event necessary? Clients can read, who is activated.
   )

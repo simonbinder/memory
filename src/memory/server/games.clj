@@ -1,22 +1,21 @@
 (ns memory.server.games
   (:require
-    [digest :as digest]
     [clojure.java.io :as io]))
+(require 'digest)
 (def users (atom {}))
 (def games (atom {}))
 
-;;(require 'digest '[clojure.java.io :as io])
+(defn get-sibling-of-card [id]
+   (if (odd?)
+    (dec id)
+    (inc id)))
 
-(defn player-nil? [player-key game-id]
-  (nil? (get-in (get @games game-id) [player-key :uid])))
+(defn match? [card-one card-two]
+   (= card-two (get-sibling-of-card card-one)))
 
-(defn add-player-to-game [uid game-id]
-  (if (player-nil? :player-two game-id)
-    (swap! games assoc-in [game-id :player-two :uid] uid)
-    (if (player-nil? :player-one game-id)
-       (swap! games assoc-in [game-id :player-one :uid] uid)
-       (throw (Exception. "There are already two players participating in this game.")))))
-
+;; too long TODO: not random - same value always generates same id?
+(defn create-game-id [uid]
+     (digest/md5 uid))
 
 (defn load-deck-files[]
   (def directory (clojure.java.io/file  "./resources/public/assets"))
@@ -25,37 +24,43 @@
     (when (.isFile file)
       (.getPath file))))
   (def files-clean (remove nil? files))
-  (println "Files: " files-clean)
-  files-clean)
+files-clean)
 
-(def deck (load-deck-files))
+(defn create-deck-vector[]
+  (def deck-list
+    (for [file (load-deck-files)]
+      { :id (str (java.util.UUID/randomUUID))
+        :url file
+        :turned false
+        :resolved 0}))
+  (def deck-vector
+    (into [] deck-list))
+    deck-vector)
 
-(defn generate-id[start-value]
-   (def ids (take 18 (iterate (partial + 2) start-value)))
-   ids)
-
-;; TODO: shuffle
 (defn create-deck[]
-  (def closed-cards-1 (apply assoc {} (interleave (generate-id 0) deck)))
-  (def closed-cards-2 (apply assoc {} (interleave (generate-id 1) deck)))
-  (def closed-cards (merge closed-cards-1 closed-cards-2))
-  closed-cards)
+      (def deck (into [] (concat (create-deck-vector) (create-deck-vector))))
+      (def deck-shuffled (shuffle deck))
+      deck-shuffled)
 
+(defn player-nil? [player-key game-id]
+  (nil? (first (vals(select-keys (get (get @games game-id) :players) [player-key])))))
+
+(defn add-player-to-game [uid game-id]
+  (if (nil? (get @games game-id))
+    (throw (Exception. "Game does not exist."))
+    (if (player-nil? 1 game-id)
+      ((swap! games assoc-in [game-id :players 1] uid)
+      (swap! users assoc-in [uid] game-id))
+      (if (player-nil? 2 game-id)
+        ((swap! games assoc-in [game-id :players 2] uid)s
+         (swap! users assoc-in [uid] game-id))
+         (throw (Exception. "There are already two players participating in this game."))))))
 
 (defn create-new-game [player-one-uid]
-  {
-   :player-one {
-                :uid player-one-uid
-                :resolved-pairs (list)}
-   :player-two {
-                :uid nil
-                :resolved-pairs (list)}
-   :closed-cards (create-deck)
-   :active-user (rand-int 1)})
-
-;; too long TODO: not random - same value always generates same id?
-(defn create-game-id [uid]
-  (digest/md5 uid))
+    {
+     :players {1 player-one-uid 2 nil}
+     :active-player 1
+     :deck (create-deck)})
 
 ;;does this append the single elements or append the whole map?
 (defn add-new-game [uid]
@@ -64,11 +69,3 @@
     (swap! users assoc-in [uid] game-id)
     game-id
    ))
-
-(defn get-sibling-of-card [id]
- (if (odd?)
-  (dec id)
-  (inc id)))
-
-(defn match? [card-one card-two]
- (= card-two (get-sibling-of-card card-one)))

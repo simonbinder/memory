@@ -25,30 +25,33 @@
 (defmethod forward-game-when :cards-not-matching)
 (defmethod forward-game-when :game-finished))
 
+(declare cards-match? filter-unresolved-cards filter-turned-cards)
+
 (defn determine-game-state [game]
  (let [{:keys [deck]} game
        unresolved (filter-unresolved-cards deck)
        turned (filter-turned-cards unresolved)]
+   (println (str "here are " deck  " " unresolved " " turned))
    (when (= (count turned) (unresolved)) ;two cards are left, both are turned
       :game-finished)
    (when (= 1 (count turned))
       :first-card-selected)
    (when (= (count turned) 2)
-      ((if (match? turned)
+      ((if (cards-match? turned)
         :cards-matching
         :cards-not-matching)))))
 
 
-(defn match? [[card-one card-two]]
+(defn cards-match? [[card-one card-two]]
   (= (:url card-one) (:url card-two)))
 
 (defn filter-unresolved-cards [deck]
-  (filter #(= (:resolved %) 0)) deck)
+  (filter #(= (% :resolved) 0) deck))
 
 (defn filter-turned-cards [deck]
   (filter #(true? (:turned %))) deck)
 
-(validate-player-action [sender-uid game]
+(defn validate-player-action [sender-uid game]
   (if (not= sender-uid (get-active-player-uid game))
      (throw (.Exception (str "Event received from player "))))
 )

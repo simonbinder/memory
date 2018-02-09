@@ -29,6 +29,9 @@
   (println "Hello from User: " uid client-id ?data)
   (broadcast))
 
+(defmethod event :game/selected-card [{:as event :keys [uid ?data]}]
+   (eventhandler/handle-card-selected [uid (:game ?data)]))
+
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
     (println "New connection:" uid client-id))
 

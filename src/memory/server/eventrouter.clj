@@ -25,7 +25,6 @@
 (defmethod event :game/join-game [{:as ev-msg :keys [event uid client-id ?data ]}]
   (eventhandler/join-game-handler uid (:game-id ?data)))
 
-
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
 
@@ -38,6 +37,7 @@
     (println "New connection:" uid client-id))
 
 (defmethod event :chsk/uidport-close [{:keys [uid]}]
+      (eventhandler/player-disconnected-handler uid)
       (println "Disconnected:" uid))
 
 (defmethod event :chsk/ws-ping [_])

@@ -43,11 +43,8 @@ files-clean)
       deck-shuffled)
 
 (defn player-nil? [player-key game-id]
-  (nil? (first
-    (vals (select-keys
-        (get (get @games game-id)
-        :players)
-        [player-key])))))
+  (nil? (first (vals (select-keys
+        (get (get @games game-id) :players) [player-key])))))
 
 (defn add-player-to-game [uid game-id]
   (if (nil? (get @games game-id))

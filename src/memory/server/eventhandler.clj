@@ -17,11 +17,17 @@
     (first (filter (comp #{uid}  (get (get @games/games game-id) :players))
       (keys (get (get @games/games game-id) :players)))))
 
+(defn game-nil? [game-id]
+  (every? empty? (vals (select-keys
+        (get (get @games/games game-id) :players) [1 2]))))
+
 (defn player-disconnected [uid]
   (def game-id (get @games/users uid))
   (def player-index (filter-players uid game-id))
   (swap! games/games assoc-in [game-id :players player-index] nil)
- (swap! games/users dissoc uid))
+ (swap! games/users dissoc uid)
+ (if (game-nil? game-id)
+ (swap! games/games dissoc game-id)))
 
 (defn join-game-handler [uid game-id]
   ;; TODO ADD Error handling

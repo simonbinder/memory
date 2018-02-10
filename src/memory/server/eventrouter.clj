@@ -37,7 +37,7 @@
     (println "New connection:" uid client-id))
 
 (defmethod event :chsk/uidport-close [{:keys [uid]}]
-      (eventhandler/player-disconnected uid)
+      (eventhandler/player-disconnected-handler uid)
       (println "Disconnected:" uid))
 
 (defmethod event :chsk/ws-ping [_])

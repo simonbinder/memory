@@ -4,6 +4,7 @@
     [memory.server.games :refer :all]
     [clojure.test :refer :all]))
 
+
 ;; TESTS ------------------------
 
 (declare get-card)
@@ -31,7 +32,7 @@
                  (println actual)
                  (is (= expected actual))))))
 
-(deftest)
+;;(deftest)
 
 ;; HELPERS --------------------------------
 (defn get-game [] {
@@ -54,7 +55,7 @@
 ;; to run test, run 'lein test' at the projects root
 ;;Example testcase using function four from eventhandler.clj
 (comment
- (deftest test-four ;; the testname
+ "(deftest test-four ;; the testname
  (testing "four is four"
    (is (= 4 (four)))))
 
@@ -66,7 +67,7 @@
 (def my-fixture [test]
    (def cards [{:value 1}{:value 2}])
    (test)
-)
+)"
 )
 ;;uncomment to use fixtures
 ;;(use-fixtures :each my-fixture)

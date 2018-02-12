@@ -34,15 +34,14 @@
  (let [{:keys [deck]} game
        unresolved (filter-unresolved-cards deck)
        turned (filter-turned-cards unresolved)]
-   (println (str "here are " deck  " " unresolved " " turned))
-   (when (= (count turned) (unresolved)) ;two cards are left, both are turned
-      :game-finished)
-   (when (= 1 (count turned))
-      :first-card-selected)
-   (when (= (count turned) 2)
-      ((if (cards-match? turned)
-        :cards-matching
-        :cards-not-matching)))))
+   (if (= 1 (count turned))
+     :first-card-selected
+     (if (= (count turned) 2)
+        (if (= 2 (count unresolved))
+           :game-finished
+           (if (cards-match? turned)
+               :cards-matching
+               :cards-not-matching))))))
 
 
 (defn cards-match? [[card-one card-two]]
@@ -52,7 +51,7 @@
   (filter #(= (% :resolved) 0) deck))
 
 (defn filter-turned-cards [deck]
-  (filter #(true? (:turned %))) deck)
+  (filter #(:turned %) deck))
 
 (defn validate-player-action [sender-uid game]
   (if (not= sender-uid (get-active-player-uid game))

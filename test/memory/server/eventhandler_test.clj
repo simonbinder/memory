@@ -11,16 +11,20 @@
 
 (deftest test-determine-game-state
 
-   (testing "finished game"
-      (testing "Only One Card Opened, two cards left."
+   (testing "Finished game: "
+      (testing "Two unresolved cards left, one card turned."
           (let [game {:deck [(get-card)(get-card "file_one" true 0)]}]
               (is (= :first-card-selected (determine-game-state game)))))
-      (testing "both cards opened, only one pair left."
+      (testing "Two unresolved cards left, both cards opened."
           (let [game {:deck [(get-card "file_one" true 0)(get-card "file_one" true 0)]}]
-              (is (not= :finished (determine-game-state game)))))
-      (testing "2 pairs left, two cards left and turned."
+              (is (= :game-finished (determine-game-state game)))))
+      (testing "4 unresolved cards left, two macthing cards turned."
           (let [game {:deck [(get-card "file_one" false 1)(get-card "file_one" false 1)(get-card "file_two" true 0)(get-card "file_two" true 0)]}]
-              (is (= :finished (determine-game-state game)))))))
+              (is (= :game-finished (determine-game-state game))))))
+    (testing "CARDS NOT MATCHING: "
+       (testing "4 unresolved cards in deck, two cards turned and not matching."
+           (let [game {:deck [(get-card)(get-card)(get-card "one" true 0)(get-card "two" true 0)]}]
+               (is (= :cards-not-matching (determine-game-state game)))))))
 
 
 (deftest filter-unresolved-cards-test
@@ -32,7 +36,11 @@
                  (println actual)
                  (is (= expected actual))))))
 
-;;(deftest)
+(deftest filter-turned-cards-test
+    (testing "FILTER TURNED CARDS: "
+        (testing "One turned, one not turned."
+            (let [deck [(get-card)(get-card "one" true 0)]]
+                (is (= 1 (count (filter-turned-cards deck))))))))
 
 ;; HELPERS --------------------------------
 (defn get-game [] {

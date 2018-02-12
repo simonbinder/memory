@@ -67,8 +67,8 @@
   (swap! @games/games assoc-in [game-id] game)
   (def turned-ids (get-turned-cards game))
   (for [turned-id turned-ids]
-    (swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
-    (swap! @games/games assoc-in [game-id :deck :turned] false)
+    ((swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
+    (swap! @games/games assoc-in [game-id :deck :turned] false))
   )
   (multicast-event-to-game :game/send-game-data (get @games/users uid)))
 
@@ -86,35 +86,33 @@
   (swap! @games/games assoc-in [game-id] game)
   (def turned-ids (get-turned-cards game))
   (for [turned-id turned-ids]
-    (swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
-    (swap! @games/games assoc-in [game-id :deck :turned] false)
+    ((swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
+    (swap! @games/games assoc-in [game-id :deck :turned] false))
   )
   (multicast-event-to-game :game/game-finished (get @games/users uid))
   )
 
-(defn filter-unresolved-cards [deck]
-  (filter #(= (% :resolved) 0) deck))
+  (defn cards-match? [[card-one card-two]]
+      (= (:url card-one) (:url card-two)))
 
-(defn filter-turned-cards [deck]
-  (filter #(true? (:turned %))) deck)
+  (defn filter-unresolved-cards [deck]
+        (filter #(= (% :resolved) 0) deck))
 
-(defn cards-match? [[card-one card-two]]
-    (= (:url card-one) (:url card-two)))
+  (defn filter-turned-cards [deck]
+        (filter #(:turned %) deck))
 
 (defn determine-game-state [game]
  (let [{:keys [deck]} game
        unresolved (filter-unresolved-cards deck)
        turned (filter-turned-cards unresolved)]
-   (println (str "here are " deck  " " unresolved " " turned))
-   (when (= (count turned) (unresolved)) ;two cards are left, both are turned
-      :game-finished)
-   (when (= 1 (count turned))
-      :first-card-selected)
-   (when (= (count turned) 2)
-      ((if (cards-match? turned)
-        :cards-matching
-        :cards-not-matching)))))
-
+   (if (= 1 (count turned))
+     :first-card-selected
+     (if (= (count turned) 2)
+        (if (= 2 (count unresolved))
+           :game-finished
+           (if (cards-match? turned)
+               :cards-matching
+               :cards-not-matching))))))
 
 (defn validate-player-action [sender-uid game]
   (if (not= sender-uid (get-active-player-uid game))

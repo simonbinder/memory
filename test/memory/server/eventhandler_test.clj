@@ -7,7 +7,7 @@
 
 ;; TESTS ------------------------
 
-(declare get-card)
+(declare get-card multicast-event-to-game-dummy)
 
 (deftest test-determine-game-state
 
@@ -42,7 +42,62 @@
             (let [deck [(get-card)(get-card "one" true 0)]]
                 (is (= 1 (count (filter-turned-cards deck))))))))
 
+(deftest forward-game-when-first-card-selected
+    (testing "FORWARD GAME WHEN FIRST CARD SELECTED"
+        (testing "Game is multicasted to Clients."
+            (declare dummy-fn-params)
+            (let game {:deck [(get-card "y" false 0)(get-card "x" true 0)]}]
+                      (forward-game-when multicast-event-to-game-dummy game TODOmissingparam)
+                      (is (= [:game/send-game-data new-game] dummy-fn-params))))))
+
+(deftest forward-game-when-cards-matching
+    (testing "FORWARD GAME WHEN CARDS MATCHING "
+        (declare dummy-fn-params)
+        (let [game {:deck [(get-card)(get-card)(get-card "x" true 0)(get-card "x" true 0)]}
+             new-game (forward-game-when multicast-event-to-game-dummy game TODOMissingParam)]
+            (testing "...game is multicasted to clients. "
+                (is (= [:game/send-game-data new-game] dummy-fn-params)))
+            (testing "...new game contains 0 turned cards."
+                (is (= (count-turned-cards (:deck new-game)) (count-turned-cards (:deck game)))))
+            (testing "...new game contains +2 resolved cards for player that was active."
+                (let [old-player (:active-player game)]
+                    (is (= (+ 2 (count-resolved-cards-of-player (:deck game) old-player)) (count-resolved-cards-of-player (:deck new-game) old-player)))))
+            (testing "...active player not changed."
+                (is (= (:active-player game) (:active-player new-game))))))
+
+(deftest forward-game-when-cards-matching
+    (testing "FORWARD GAME WHEN CARDS NOT MATCHING "
+        (declare dummy-fn-params)
+        (let [game {:deck [(get-card "x" true 0)(get-card "y" true 0)]}
+             new-game (forward-game-when multicast-event-to-game-dummy game TODOMissingParam)]
+                (testing "...game is multicast to clients"
+                    (is (= dummy-fn-params [:game/send-game-data new-game])))
+                (testing "...new game contains 0 turned cards. "
+                    (is (= (count-turned-cards (:deck new-game)) (count-turned-cards (:deck game)))))
+                (testing "...new game's resolved cards amount does not change."
+                    (is (= (count-resolved-cards (:deck new-game)) (count-resolved-cards (:deck game)))))
+                (testing "...active player changed."
+                    (is (not= (:active-player game) (:active-player new-game)))))))
+
+(deftest forward-game-when-game-finished
+    (testing "FORWARD GAME WHEN GAME FINISHED"
+        (declare dummy-fn-params)
+        (let [game {:deck [(get-card "x" false 1)(get-card "x" false 1)(get-card "y" true 0)(get-card "y" true 0)]}
+             new-game (forward-game-when multicast-event-to-game-dummy game TODOMissingParam)]
+                 (testing "...game is multicasted to clients with game-finished event."
+                     (is (= dummy-fn-params [:game/game-finished new-game])))
+                 (testing "...new game contains 0 turned cards."
+                     (is (= (count-turned-cards (:deck new-game)) (count-turned-cards (:deck game)))))
+                 (testing "...new game contains +2 resolved cards for player that was active."
+                     (let [old-player (:active-player game)]
+                         (is (= (+ 2 (count-resolved-cards-of-player (:deck game) old-player)) (count-resolved-cards-of-player (:deck new-game) old-player)))))))
+
 ;; HELPERS --------------------------------
+(defn multicast-event-to-game-dummy [event-id game-id](def dummy-fn-params [event-id game-id]))
+
+(defn count-turned-cards [deck] (count (filter #(:turned %) deck)))
+(defn count-resolved-cards-of-player [deck player](count (filter #(= (:resolved %) player)) deck))
+
 (defn get-game [] {
     :deck [(get-card)(get-card)]})
 

@@ -4,8 +4,7 @@
     [memory.server.websocket :as websocket]))
 
 ;;----------- send-methods ------------------------
-(defn multicast-event-to-game [event game-id]
-  (def game (get @games/games game-id))
+(defn multicast-event-to-game [event game]
   (def game-uids (vals (get game :players)))
     (doseq [uid game-uids]
        (websocket/chsk-send! uid [event game])))
@@ -51,7 +50,7 @@
   (def turned-cards
   (for [card deck]
     (when (true? (get card :turned))
-      (get card :id))))
+      (get card))))
   (def turned-cards-clean (remove nil? turned-cards))
   turned-cards-clean)
 
@@ -59,37 +58,44 @@
 
 (defmethod forward-game-when :first-card-selected [uid game]
   (def game-id (get @games/users uid))
-  (swap! @games/games assoc-in [game-id] game)
-  (multicast-event-to-game :game/send-game-data (get @games/users uid)))
+  (def changed-game (get @games/games game-id))
+  (multicast-event-to-game :game/send-game-data changed-game) changed-game)
 
 (defmethod forward-game-when :cards-matching [uid game]
   (def game-id (get @games/users uid))
-  (swap! @games/games assoc-in [game-id] game)
-  (def turned-ids (get-turned-cards game))
-  (for [turned-id turned-ids]
-    ((swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
-    (swap! @games/games assoc-in [game-id :deck :turned] false))
+  (def turned-cards (get-turned-cards game))
+  (for [card turned-cards]
+    (
+    (def index (.indexOf (get game :deck) card))
+    (swap! @games/games assoc-in [game-id :deck index :resolved] (get-active-player-uid game))
+    (swap! @games/games assoc-in [game-id :deck index :turned] false))
   )
-  (multicast-event-to-game :game/send-game-data (get @games/users uid)))
+  (def changed-game (get @games/games game-id))
+  (multicast-event-to-game :game/send-game-data changed-game) changed-game)
 
 (defmethod forward-game-when :cards-not-matching [uid game]
   (def game-id (get @games/users uid))
-  (swap! @games/games assoc-in [game-id] game)
-  (def turned-ids (get-turned-cards game))
-  (for [turned-id turned-ids]
-    (swap! @games/games assoc-in [game-id :deck :turned] false)
+  (def turned-cards (get-turned-cards game))
+  (for [card turned-cards]
+    (
+    (def index (.indexOf (get game :deck) card))
+    (swap! @games/games assoc-in [game-id :deck index :turned] false))
   )
-  (multicast-event-to-game :game/send-game-data (get @games/users uid)))
+  (def changed-game (get @games/games game-id))
+  (multicast-event-to-game :game/send-game-data changed-game) changed-game)
 
 (defmethod forward-game-when :game-finished [uid game]
   (def game-id (get @games/users uid))
-  (swap! @games/games assoc-in [game-id] game)
-  (def turned-ids (get-turned-cards game))
-  (for [turned-id turned-ids]
-    ((swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
-    (swap! @games/games assoc-in [game-id :deck :turned] false))
+  (def turned-cards (get-turned-cards game))
+  (for [card turned-cards]
+    (
+    (def index (.indexOf (get game :deck) card))
+    (swap! @games/games assoc-in [game-id :deck index :resolved] (get-active-player-uid game))
+    (swap! @games/games assoc-in [game-id :deck index :turned] false))
   )
-  (multicast-event-to-game :game/game-finished (get @games/users uid))
+  (def changed-game (get @games/games game-id))
+  (multicast-event-to-game :game/game-finished changed-game)
+  changed-game
   )
 
   (defn cards-match? [[card-one card-two]]
@@ -134,7 +140,7 @@
     (throw (Exception. "Game does not exist."))))
   (games/add-player-to-game uid game-id)
   (def game (get @games/games game-id))
-  (multicast-event-to-game :game/send-game-data game-id))
+  (multicast-event-to-game :game/send-game-data game))
 
 
 ;; For testing demo

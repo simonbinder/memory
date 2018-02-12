@@ -44,7 +44,7 @@
        ((:players game)(:active-player game)))
 
 (declare card-selected-handler validate-player-action
-  get-active-player-uid determine-game-state)
+  determine-game-state)
 
 (defn get-turned-cards [game]
   (def deck (get game :deck))
@@ -55,7 +55,7 @@
   (def turned-cards-clean (remove nil? turned-cards))
   turned-cards-clean)
 
-(defmulti forward-game-when (fn [x1 x2] ()))
+(defmulti forward-game-when determine-game-state)
 
 (defmethod forward-game-when :first-card-selected [uid game]
   (def game-id (get @games/users uid))
@@ -101,7 +101,7 @@
   (defn filter-turned-cards [deck]
         (filter #(:turned %) deck))
 
-(defn determine-game-state [game]
+(defn determine-game-state [uid game]
  (let [{:keys [deck]} game
        unresolved (filter-unresolved-cards deck)
        turned (filter-turned-cards unresolved)]
@@ -114,13 +114,16 @@
                :cards-matching
                :cards-not-matching))))))
 
+;;TODO Do we need this?
 (defn validate-player-action [sender-uid game]
   (if (not= sender-uid (get-active-player-uid game))
      (throw (.Exception (str "Event received from player "))))
 )
 
-(defn handle-card-selected [uid game]
-  (validate-player-action uid game))
+(defn card-selected-handler [uid game]
+  ;; TODO Should we check for valid input from client? (validate-player-action uid game)
+  (forward-game-when uid game)
+)
 
 (defn create-game-handler [uid]
      (games/add-new-game uid))

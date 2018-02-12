@@ -40,22 +40,66 @@
 (defn send-error [event uid message]
   (websocket/chsk-send! uid [event message]))
 
-(defn create-game-handler [uid]
-     (games/add-new-game uid))
+(defn get-active-player-uid [game]
+       ((:players game)(:active-player game)))
 
-(declare handle-card-selected validate-player-action get-active-player-uid determine-game-state)
+(declare card-selected-handler validate-player-action
+  get-active-player-uid determine-game-state)
 
-(defn handle-card-selected [uid game]
-  (validate-player-action uid game))
+(defn get-turned-cards [game]
+  (def deck (get game :deck))
+  (def turned-cards
+  (for [card deck]
+    (when (true? (get card :turned))
+      (get card :id))))
+  (def turned-cards-clean (remove nil? turned-cards))
+  turned-cards-clean)
 
-(comment
-(defmulti forward-game-when determine-game-state)
-(defmethod forward-game-when :first-card-selected)
-(defmethod forward-game-when :cards-matching)
-(defmethod forward-game-when :cards-not-matching)
-(defmethod forward-game-when :game-finished))
+(defmulti forward-game-when (fn [x1 x2] ()))
 
-(declare cards-match? filter-unresolved-cards filter-turned-cards)
+(defmethod forward-game-when :first-card-selected [uid game]
+  (def game-id (get @games/users uid))
+  (swap! @games/games assoc-in [game-id] game)
+  (multicast-event-to-game :game/send-game-data (get @games/users uid)))
+
+(defmethod forward-game-when :cards-matching [uid game]
+  (def game-id (get @games/users uid))
+  (swap! @games/games assoc-in [game-id] game)
+  (def turned-ids (get-turned-cards game))
+  (for [turned-id turned-ids]
+    (swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
+    (swap! @games/games assoc-in [game-id :deck :turned] false)
+  )
+  (multicast-event-to-game :game/send-game-data (get @games/users uid)))
+
+(defmethod forward-game-when :cards-not-matching [uid game]
+  (def game-id (get @games/users uid))
+  (swap! @games/games assoc-in [game-id] game)
+  (def turned-ids (get-turned-cards game))
+  (for [turned-id turned-ids]
+    (swap! @games/games assoc-in [game-id :deck :turned] false)
+  )
+  (multicast-event-to-game :game/send-game-data (get @games/users uid)))
+
+(defmethod forward-game-when :game-finished [uid game]
+  (def game-id (get @games/users uid))
+  (swap! @games/games assoc-in [game-id] game)
+  (def turned-ids (get-turned-cards game))
+  (for [turned-id turned-ids]
+    (swap! @games/games assoc-in [game-id :deck :resolved] (get-active-player-uid game))
+    (swap! @games/games assoc-in [game-id :deck :turned] false)
+  )
+  (multicast-event-to-game :game/game-finished (get @games/users uid))
+  )
+
+(defn filter-unresolved-cards [deck]
+  (filter #(= (% :resolved) 0) deck))
+
+(defn filter-turned-cards [deck]
+  (filter #(true? (:turned %))) deck)
+
+(defn cards-match? [[card-one card-two]]
+    (= (:url card-one) (:url card-two)))
 
 (defn determine-game-state [game]
  (let [{:keys [deck]} game
@@ -72,23 +116,16 @@
         :cards-not-matching)))))
 
 
-(defn cards-match? [[card-one card-two]]
-  (= (:url card-one) (:url card-two)))
-
-(defn filter-unresolved-cards [deck]
-  (filter #(= (% :resolved) 0) deck))
-
-(defn filter-turned-cards [deck]
-  (filter #(true? (:turned %))) deck)
-
 (defn validate-player-action [sender-uid game]
   (if (not= sender-uid (get-active-player-uid game))
      (throw (.Exception (str "Event received from player "))))
 )
 
-(defn get-active-player-uid [game]
-  ((:players game)(:active-player game))
-)
+(defn handle-card-selected [uid game]
+  (validate-player-action uid game))
+
+(defn create-game-handler [uid]
+     (games/add-new-game uid))
 
 (defn join-game-handler [uid game-id]
   (if (nil? (get @games/games game-id))

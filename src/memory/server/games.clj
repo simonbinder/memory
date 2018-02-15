@@ -18,29 +18,29 @@
      (digest/md5 uid))
 
 (defn load-deck-files[]
-  (def directory (clojure.java.io/file  "./resources/public/assets"))
-  (def files
+  (let [directory (clojure.java.io/file  "./resources/public/assets")]
+  (let [files
     (for [file (file-seq directory)]
     (when (.isFile file)
-      (.getPath file))))
-  (def files-clean (remove nil? files))
-files-clean)
+      (.getPath file)))]
+  (let [files-clean (remove nil? files)]
+files-clean))))
 
 (defn create-deck-vector[]
-  (def deck-list
+  (let [deck-list
     (for [file (load-deck-files)]
       { :id (str (java.util.UUID/randomUUID))
         :url file
         :turned false
-        :resolved 0}))
-  (def deck-vector
-    (into [] deck-list))
-    deck-vector)
+        :resolved 0})]
+  (let [deck-vector
+    (into [] deck-list)]
+    deck-vector)))
 
 (defn create-deck[]
-      (def deck (into [] (concat (create-deck-vector) (create-deck-vector))))
-      (def deck-shuffled (shuffle deck))
-      deck-shuffled)
+      (let [deck (into [] (concat (create-deck-vector) (create-deck-vector)))
+        deck-shuffled (shuffle deck)]
+      deck-shuffled))
 
 (defn player-nil? [player-key game-id]
   (nil? (first (vals (select-keys

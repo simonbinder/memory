@@ -24,8 +24,38 @@
               {:id 15 :url "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC2b6U3sUWG3XWf0o-rCRN7KXhF9xvPAbBFht-gTsq8r1m1LeRug" :turned false :resolved 0}
               {:id 16 :url "http://media.einfachtierisch.de/thumbnail/600/0/media.einfachtierisch.de/images/2013/01/Junge-Katze-Erziehen.jpg" :turned false :resolved 0}]}))
 
+;; state
+;; 0 -> not started (options start new game or join)
+;; 1 -> started (waiting for second player)
+;; 2 -> started (game can begin)
+(defonce app-state (atom {:state 0 :game-id ""}))
 
-(defonce app-state (atom {:text "Hello world!"}))
+(defn set-game-id [reply]
+  (let [game-id (get reply :game-id)]
+  (swap! app-state assoc :game-id (str game-id))
+  (swap! app-state assoc :state 1)))
+
+(defn start-view []
+  (let [input-value (atom "nil")]
+  [:div#start-view
+    [:input  {:type "button"
+              :value "Spiel starten"
+              :on-click
+                (fn [e]
+                  (communication/create-game set-game-id))}]
+    [:input  {:type "button"
+              :value "Spiel beitreten"
+              :on-click
+                (fn [e]
+                  (communication/join-game (:game-id @app-state)))}]
+    [:input  {:type "text"
+              :value @input-value
+              :on-change #(reset! input-value (-> % .-target .-value))}]]))
+
+(defn waiting-view []
+  [:div#waiting-view
+    [:p "Schicke die unten angegebene Game-ID an einen Freund. Sobald dieser dem Spiel beitritt kann das Spiel beginnen."]
+    [:p (str "Game-ID: "(:game-id @app-state))]])
 
 (defn card-item-open []
   (fn [{:keys [title, turned]}]
@@ -50,22 +80,17 @@
       [:div#gameboard
         [:ul#card-list {:style {:width "600px"}}
         (for [card cards]
-             ^{:key (:id card)} [card-item card])
-        ]]))
+             ^{:key (:id card)} [card-item card])]]))
 
-
-(defn hello-world []
+(defn main-view []
   [:div
-   [:h1 (:text @app-state)]
-   [:h3 "Edit this and test!"]
-   [:input  {:type "button" :value "Click me"
-            :on-click
-            (fn [e]
-              (communication/send-hello))}]
-   [gameboard]
-   ])
+    [:h1 "Memory"]
+    (case (get @app-state :state)
+        0 [start-view]
+        1 [waiting-view]
+        2 [gameboard])])
 
-(reagent/render-component [hello-world]
+(reagent/render-component [main-view]
                           (. js/document (getElementById "app")))
 
 (defn on-js-reload []

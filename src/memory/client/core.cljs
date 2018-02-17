@@ -30,27 +30,44 @@
 ;; 2 -> started (game can begin)
 (defonce app-state (atom {:state 0 :game-id ""}))
 
-(defn set-game-id [reply]
+(defn set-game-id [game-id]
+  (swap! app-state assoc :game-id (str game-id)))
+
+(defn start-game-reply [reply]
+  (print reply)
   (let [game-id (get reply :game-id)]
-  (swap! app-state assoc :game-id (str game-id))
+  (set-game-id game-id)
   (swap! app-state assoc :state 1)))
 
+(defn join-game-reply [reply]
+  ;(let [deck (get (get reply 2) :deck)]
+  (print "join-game-reply" reply)
+  ;(print "deck" deck)
+  ;(swap! game assoc :deck deck)
+  (swap! app-state assoc :state 2)))
+
+(defn join-game [game-id]
+  (print game-id)
+  (set-game-id game-id)
+  (communication/join-game game-id join-game-reply))
+
 (defn start-view []
-  (let [input-value (atom "nil")]
-  [:div#start-view
+  (let [input-value (atom "")]
+  (fn []
+    [:div#start-view
     [:input  {:type "button"
               :value "Spiel starten"
               :on-click
                 (fn [e]
-                  (communication/create-game set-game-id))}]
+                  (communication/create-game start-game-reply))}]
     [:input  {:type "button"
               :value "Spiel beitreten"
               :on-click
                 (fn [e]
-                  (communication/join-game (:game-id @app-state)))}]
-    [:input  {:type "text"
-              :value @input-value
-              :on-change #(reset! input-value (-> % .-target .-value))}]]))
+                  (join-game @input-value))}]
+    [:input {:type "text"
+             :value @input-value
+             :on-change #(reset! input-value (-> % .-target .-value))}]])))
 
 (defn waiting-view []
   [:div#waiting-view
@@ -76,7 +93,6 @@
 (defn gameboard []
     (let [game @game
           cards (get game :deck)]
-          (print cards)
       [:div#gameboard
         [:ul#card-list {:style {:width "600px"}}
         (for [card cards]

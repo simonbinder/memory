@@ -44,11 +44,11 @@
 
 (defn print-reply [reply] (println reply))
 
-(defn create-game [set-game-id]
-  (chsk-send! [:game/create-game {:game "game"}] 8000 set-game-id))
+(defn create-game [start-game-reply]
+  (chsk-send! [:game/create-game {:game "game"}] 8000 start-game-reply))
 
-(defn join-game [game-id]
-  (chsk-send! [:game/join-game {:game-id game-id}]))
+(defn join-game [game-id join-game-reply]
+  (chsk-send! [:game/join-game {:game-id game-id}] 8000 join-game-reply))
 
 (defmethod event-msg-handler :chsk/handshake [{:as ev-msg :keys [?data]}]
     (let [[?uid ?csrf-token ?handshake-data] ?data]

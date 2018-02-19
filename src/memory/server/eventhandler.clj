@@ -1,7 +1,8 @@
 (ns memory.server.eventhandler
   (:require
     [memory.server.games :as games]
-    [memory.server.websocket :as websocket]))
+    [memory.server.websocket :as websocket]
+    [memory.server.event-sender :as event-sender]))
 
 ;;----------- send-methods ------------------------
 (defn multicast-event-to-game [event game]
@@ -93,7 +94,7 @@
   (let [game-id (get @games/users uid)
    changed-game (get @games/games game-id)]
   (println "first cards selected")
-  (multicast-event-to-game :game/send-game-data changed-game) changed-game))
+  (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game)))
 
 (defmethod forward-game-when :cards-matching [uid game]
   (let [game-id (get @games/users uid)
@@ -107,8 +108,8 @@
   )
   (swap! games/games assoc-in [game-id :active-player] (change-active-player game))
   (let [changed-game (get @games/games game-id)]
-  (println "cards matching")
-  (multicast-event-to-game :game/send-game-data changed-game) changed-game)))
+    (println "cards matching")
+    (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game))))
 
 (defmethod forward-game-when :cards-not-matching [uid game]
   (let [game-id (get @games/users uid)

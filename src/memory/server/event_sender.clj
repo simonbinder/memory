@@ -13,7 +13,4 @@
       (if-not (nil? uid)
         (websocket/chsk-send! uid [event message])))))
 
-(defn multicast-event-to-game [event game]
-    (let ))
-
 (defn multicast-game-to-players [game])

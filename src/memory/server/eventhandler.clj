@@ -5,6 +5,7 @@
     [memory.server.event-sender :as event-sender]))
 
 ;;----------- send-methods ------------------------
+(comment
 (defn multicast-event-to-game [event game]
   (let [game-uids (vals (get game :players))]
     (doseq [uid game-uids]
@@ -16,7 +17,7 @@
       (doseq [uid game-uids]
       (if-not (nil? uid)
         (websocket/chsk-send! uid [event message])))))
-
+)
 ;;------------------- util-methods ------------------------
 (defn filter-players [uid game-id]
     (first (filter (comp #{uid}  (get (get @games/games game-id) :players))
@@ -119,7 +120,7 @@
   )
   (let [changed-game (get @games/games game-id)]
   (println "cards not matching")
-  (multicast-event-to-game :game/send-game-data changed-game) changed-game)))
+  (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game))))
 
 (defmethod forward-game-when :game-finished [uid game]
   (let [game-id (get @games/users uid)
@@ -131,9 +132,7 @@
     (swap! games/games assoc-in [game-id :deck (.indexOf (get game :deck) card) :turned] false)
   )
   (let [changed-game (get @games/games game-id)]
-  (multicast-event-to-game :game/game-finished changed-game)
-  changed-game
-  )))
+  (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game))))
 
 ;;TODO Do we need this?
 (defn validate-player-action [sender-uid game]
@@ -155,7 +154,7 @@
     (throw (Exception. "Game does not exist."))))
   (games/add-player-to-game uid game-id)
   (let [game (get @games/games game-id)]
-  (multicast-event-to-game :game/send-game-data game)))
+  (event-sender/multicast-event-to-game [:game/send-game-data game] game)))
 
 
 ;; For testing demo

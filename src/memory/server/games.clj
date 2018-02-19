@@ -70,3 +70,6 @@ files-clean))))
     (swap! users assoc-in [uid] game-id)
     game-id
    ))
+
+(defn get-game [id] (get @games id))
+(defn remove-game [game-id] (swap! dissoc game-id))

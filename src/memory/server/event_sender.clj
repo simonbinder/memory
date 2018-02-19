@@ -1,16 +1,16 @@
 (ns memory.server.event-sender
 [memory.server.websocket :as websocket])
 
-(defn multicast-event-to-game [event game]
-  (let [game-uids (vals (get game :players))]
-    (doseq [uid game-uids]
-       (websocket/chsk-send! uid [event]))))
+(defn get-uids-of-game [game]
+    (filter (vals (get game :players))))
 
-(defn multicast-event-with-message [event message game-id]
-    (let [game (get @games/games game-id)
-      game-uids (vals (get game :players))]
-      (doseq [uid game-uids]
-      (if-not (nil? uid)
-        (websocket/chsk-send! uid [event message])))))
+(defn multicast-game-to-participants [game]
+    (doseq [uid (get-uids-of-game game)]
+        (websocket/chsk-send! uid [:game/send-game-data game])))
 
-(defn multicast-game-to-players [game])
+(defn multicast-event-to-participants-of-game [event game]
+    (doseq [uid (get-uids-of-game game)]
+        (websocket/chsk-send! uid [event message])))
+
+(defn send-error-to-player [error-message uid]
+    (websocket/chsk-send! uid [:error/game-not-found error-message]))

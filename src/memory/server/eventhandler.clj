@@ -1,7 +1,6 @@
 (ns memory.server.eventhandler
   (:require
     [memory.server.games :as games]
-    [memory.server.websocket :as websocket]
     [memory.server.event-sender :as event-sender]))
 
 ;;----------- send-methods ------------------------
@@ -19,30 +18,37 @@
         (websocket/chsk-send! uid [event message])))))
 )
 ;;------------------- util-methods ------------------------
-(defn filter-players [uid game-id]
+(defn get-player-for-uid-from-game [uid game-id]
     (first (filter (comp #{uid}  (get (get @games/games game-id) :players))
-      (keys (get (get @games/games game-id) :players)))))
+      (keys (get (games/get-game game-id) :players)))))
 
-(defn game-nil? [game-id]
-  (every? empty? (vals (select-keys
-        (get (get @games/games game-id) :players) [1 2]))))
+
+(defn no-player-left? [game]
+  (every? nil? (-> game :players vals))
 
 ;; ------------- handler ---------------------------------
 (defn player-disconnected-handler [uid]
-  (let [game-id (get @games/users uid)
-    player-index (filter-players uid game-id)]
-  (swap! games/games assoc-in [game-id :players player-index] nil)
- (swap! games/users dissoc uid)
- (if (game-nil? game-id)
- (swap! games/games dissoc game-id)
- (multicast-event-with-message :game/waiting-for-player
-      "Waiting for second player to connect" game-id))))
+    (let [game-id (get @games/users uid)
+          player-index (get-player-for-uid-from-game uid game-id)
+          game (-> game-id
+                   games/get-game
+                   (assoc-in [:players player-index] nil))]
+          (swap! games/users dissoc uid)
+          (if (no-player-left? game)
+              (-> game-id games/remove-game)
+              (multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game))))
 
-(defn send-error [event uid message]
-  (websocket/chsk-send! uid [event message]))
+(defn join-game-handler [uid game-id]
+  (let [game (-> game-id games/get-game)]
+      (if (nil? game)
+         (event-sender/send-error-to-player "Game does not exist")
+            ;(throw (Exception. "Game does not exist."))))
+         (do
+             (games/add-player-to-game uid game-id)
+             (event-sender/multicast-game-to-participants game)))))
 
-(defn get-active-player-uid [game]
-       ((:players game)(:active-player game)))
+
+
 
 (declare card-selected-handler validate-player-action)
 
@@ -55,28 +61,7 @@
 (defn cards-match? [[card-one card-two]]
       (= (:url card-one) (:url card-two)))
 
-(defn filter-active-player[game]
-  (let [uid (get-active-player-uid game)
-    players (get game :players)
-   active-player (first (filter (comp #{uid} players) (keys players)))]
-  active-player))
-
-  (defn change-active-player[game]
-    (let [active-player (filter-active-player game)]
-    (if (= active-player 1)
-    2
-    1)))
-
-(defn get-turned-cards [game]
-  (let [deck (get game :deck)]
-  (let [turned-cards
-  (for [card deck]
-    (when (true? (get card :turned))
-      card))]
-  (let [turned-cards-clean (remove nil? turned-cards)]
-  turned-cards-clean))))
-
-(defn determine-game-state [uid game]
+(defn determine-game-state [game]
    (let [{:keys [deck]} game
          unresolved (filter-unresolved-cards deck)
          turned (filter-turned-cards unresolved)]
@@ -89,13 +74,40 @@
                  :cards-matching
                  :cards-not-matching))))))
 
+
+(defn get-active-player-uid [game]
+       ((:players game)(:active-player game)))
+
+(defn filter-active-player[game]
+  (let [uid (get-active-player-uid game)
+    players (get game :players)
+   active-player (first (filter (comp #{uid} players) (keys players)))]
+  active-player))
+
+(defn change-active-player[game]
+    (let [active-player (filter-active-player game)]
+        (if (= active-player 1)
+            2
+            1)))
+
+(defn get-turned-cards [game]
+  (let [deck (get game :deck)]
+  (let [turned-cards
+  (for [card deck]
+    (when (true? (get card :turned))
+      card))]
+  (let [turned-cards-clean (remove nil? turned-cards)]
+  turned-cards-clean))))
+
+
+
 (defmulti forward-game-when determine-game-state)
 
 (defmethod forward-game-when :first-card-selected [uid game]
   (let [game-id (get @games/users uid)
    changed-game (get @games/games game-id)]
   (println "first cards selected")
-  (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game)))
+  (event-sender/multicast-game-to-participants changed-game)))
 
 (defmethod forward-game-when :cards-matching [uid game]
   (let [game-id (get @games/users uid)
@@ -110,7 +122,7 @@
   (swap! games/games assoc-in [game-id :active-player] (change-active-player game))
   (let [changed-game (get @games/games game-id)]
     (println "cards matching")
-    (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game))))
+    (event-sender/multicast-game-to-participants changed-game))))
 
 (defmethod forward-game-when :cards-not-matching [uid game]
   (let [game-id (get @games/users uid)
@@ -120,7 +132,7 @@
   )
   (let [changed-game (get @games/games game-id)]
   (println "cards not matching")
-  (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game))))
+  (event-sender/multicast-game-to-participants changed-game))))
 
 (defmethod forward-game-when :game-finished [uid game]
   (let [game-id (get @games/users uid)
@@ -132,7 +144,7 @@
     (swap! games/games assoc-in [game-id :deck (.indexOf (get game :deck) card) :turned] false)
   )
   (let [changed-game (get @games/games game-id)]
-  (event-sender/multicast-event-to-game [:game/send-game-data changed-game] changed-game))))
+  (event-sender/multicast-game-to-participants changed-game))))
 
 ;;TODO Do we need this?
 (defn validate-player-action [sender-uid game]
@@ -148,13 +160,7 @@
 (defn create-game-handler [uid]
      (games/add-new-game uid))
 
-(defn join-game-handler [uid game-id]
-  (if (nil? (get @games/games game-id))
-    ((send-error :error/game-not-found uid "Game does not exist")
-    (throw (Exception. "Game does not exist."))))
-  (games/add-player-to-game uid game-id)
-  (let [game (get @games/games game-id)]
-  (event-sender/multicast-event-to-game [:game/send-game-data game] game)))
+
 
 
 ;; For testing demo

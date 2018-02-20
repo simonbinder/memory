@@ -44,12 +44,24 @@
   (print "join-game-reply" reply)
   ;(print "deck" deck)
   ;(swap! game assoc :deck deck)
-  (swap! app-state assoc :state 2)))
+  )
+
+(defn receive-game [server-game]
+  (let [deck (get server-game :deck)
+        active-player (get server-game :active-player)]
+  (swap! app-state assoc :state 2)
+  (println "Server-Game: " server-game)
+  (swap! game assoc :deck deck)
+  (swap! game assoc :active-player active-player)
+  (println "Client-Game: "@game)))
 
 (defn join-game [game-id]
   (print game-id)
   (set-game-id game-id)
   (communication/join-game game-id join-game-reply))
+
+(defn handle-click []
+  (communication/send-game @game))
 
 (defn start-view []
   (let [input-value (atom "")]
@@ -105,6 +117,7 @@
         0 [start-view]
         1 [waiting-view]
         2 [gameboard])])
+
 
 (reagent/render-component [main-view]
                           (. js/document (getElementById "app")))

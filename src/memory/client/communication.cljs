@@ -2,6 +2,7 @@
   (:require-macros
    [cljs.core.async.macros :as asyncm :refer (go go-loop)])
   (:require
+    [memory.client.core :as core]
    [cljs.core.async :as async :refer (<! >! put! chan)]
    [taoensso.sente  :as sente :refer (cb-success?)]))
 
@@ -36,11 +37,12 @@
   ;; now, comes wrapped in sente.
   [{:as ev-msg :keys [?data]}]
   (let [[message-type message-payload] ?data]
-    ; (if (= message-type :test-push/hello)
-     (println ?data)))
+     (case message-type
+       :game/send-game-data (core/receive-game (nth ?data 1))
+       (println ?data))))
 
-(defn send-hello []
-  (chsk-send! [:test/id1 {:hello "hello"}]))
+(defn send-game [client-game]
+  (chsk-send! [:game/selected-card {:game client-game}]))
 
 (defn print-reply [reply] (println reply))
 

@@ -2,10 +2,9 @@
   (:require-macros
    [cljs.core.async.macros :as asyncm :refer (go go-loop)])
   (:require
-    [memory.client.core :as core]
+    [memory.client.eventhandler :as eventhandler]
    [cljs.core.async :as async :refer (<! >! put! chan)]
    [taoensso.sente  :as sente :refer (cb-success?)]))
-
 
 (defn get-chsk-url
     "Connect to a configured server instead of the page host"
@@ -38,7 +37,7 @@
   [{:as ev-msg :keys [?data]}]
   (let [[message-type message-payload] ?data]
      (case message-type
-       :game/send-game-data (core/receive-game (nth ?data 1))
+       :game/send-game-data (eventhandler/receive-game (nth ?data 1))
        (println ?data))))
 
 (defn send-game [client-game]

@@ -1,43 +1,19 @@
 (ns memory.client.core
     (:require
       [reagent.core :as reagent :refer [atom]]
+      [memory.client.model :as model]
       [memory.client.communication :as communication]))
 
 (enable-console-print!)
 
-(defonce game (atom
-      {:active-player 1
-       :deck  [ {:id 0 :url "http://cdn.kickvick.com/wp-content/uploads/2014/11/cute-baby-animals-39.jpg" :turned false :resolved 0}
-              {:id 1 :url "https://static.boredpanda.com/blog/wp-content/uuuploads/cute-baby-animals/cute-baby-animals-31.jpg" :turned false :resolved 0}
-              {:id 2 :url "https://static.boredpanda.com/blog/wp-content/uuuploads/cute-baby-animals/cute-baby-animals-10.jpg" :turned false :resolved 0}
-              {:id 3 :url "https://static.geo.de/bilder/28/52/60898/galleryimage/01-baby-faultiere-kermie.jpg" :turned false :resolved 0}
-              {:id 4 :url "https://static.boredpanda.com/blog/wp-content/uuuploads/cute-baby-animals/cute-baby-animals-31.jpg" :turned false :resolved 0}
-              {:id 5 :url "https://static.boredpanda.com/blog/wp-content/uuuploads/cute-baby-animals/cute-baby-animals-13.jpg" :turned false :resolved 0}
-              {:id 6 :url "https://winkgo.com/wp-content/uploads/2015/02/29-Tiny-Baby-Animals-so-Cute-They-Will-Take-Your-Cares-Away-01.jpg" :turned false :resolved 0}
-              {:id 7 :url "https://static.boredpanda.com/blog/wp-content/uuuploads/cute-baby-animals/cute-baby-animals-13.jpg" :turned false :resolved 0}
-              {:id 8 :url "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC2b6U3sUWG3XWf0o-rCRN7KXhF9xvPAbBFht-gTsq8r1m1LeRug" :turned false :resolved 0}
-              {:id 9 :url "https://winkgo.com/wp-content/uploads/2015/02/29-Tiny-Baby-Animals-so-Cute-They-Will-Take-Your-Cares-Away-01.jpg" :turned false :resolved 0}
-              {:id 10 :url "http://media.einfachtierisch.de/thumbnail/600/0/media.einfachtierisch.de/images/2013/01/Junge-Katze-Erziehen.jpg" :turned false :resolved 0}
-              {:id 11 :url "https://static.boredpanda.com/blog/wp-content/uuuploads/cute-baby-animals/cute-baby-animals-10.jpg" :turned false :resolved 0}
-              {:id 12 :url "http://cdn.kickvick.com/wp-content/uploads/2014/11/cute-baby-animals-39.jpg" :turned false :resolved 0}
-              {:id 13 :url "https://static.geo.de/bilder/28/52/60898/galleryimage/01-baby-faultiere-kermie.jpg" :turned false :resolved 0}
-              {:id 15 :url "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC2b6U3sUWG3XWf0o-rCRN7KXhF9xvPAbBFht-gTsq8r1m1LeRug" :turned false :resolved 0}
-              {:id 16 :url "http://media.einfachtierisch.de/thumbnail/600/0/media.einfachtierisch.de/images/2013/01/Junge-Katze-Erziehen.jpg" :turned false :resolved 0}]}))
-
-;; state
-;; 0 -> not started (options start new game or join)
-;; 1 -> started (waiting for second player)
-;; 2 -> started (game can begin)
-(defonce app-state (atom {:state 0 :game-id ""}))
-
 (defn set-game-id [game-id]
-  (swap! app-state assoc :game-id (str game-id)))
+  (swap! model/app-state assoc :game-id (str game-id)))
 
 (defn start-game-reply [reply]
   (print reply)
   (let [game-id (get reply :game-id)]
   (set-game-id game-id)
-  (swap! app-state assoc :state 1)))
+  (swap! model/app-state assoc :state 1)))
 
 (defn join-game-reply [reply]
   ;(let [deck (get (get reply 2) :deck)]
@@ -46,22 +22,14 @@
   ;(swap! game assoc :deck deck)
   )
 
-(defn receive-game [server-game]
-  (let [deck (get server-game :deck)
-        active-player (get server-game :active-player)]
-  (swap! app-state assoc :state 2)
-  (println "Server-Game: " server-game)
-  (swap! game assoc :deck deck)
-  (swap! game assoc :active-player active-player)
-  (println "Client-Game: "@game)))
-
 (defn join-game [game-id]
   (print game-id)
   (set-game-id game-id)
   (communication/join-game game-id join-game-reply))
 
+;; not implemented yet
 (defn handle-click []
-  (communication/send-game @game))
+  (communication/send-game @model/game))
 
 (defn start-view []
   (let [input-value (atom "")]
@@ -84,7 +52,7 @@
 (defn waiting-view []
   [:div#waiting-view
     [:p "Schicke die unten angegebene Game-ID an einen Freund. Sobald dieser dem Spiel beitritt kann das Spiel beginnen."]
-    [:p (str "Game-ID: "(:game-id @app-state))]])
+    [:p (str "Game-ID: "(:game-id @model/app-state))]])
 
 (defn card-item-open []
   (fn [{:keys [title, turned]}]
@@ -103,7 +71,7 @@
       )))
 
 (defn gameboard []
-    (let [game @game
+    (let [game @model/game
           cards (get game :deck)]
       [:div#gameboard
         [:ul#card-list {:style {:width "600px"}}
@@ -113,7 +81,8 @@
 (defn main-view []
   [:div
     [:h1 "Memory"]
-    (case (get @app-state :state)
+    ;; reload is not working because atom watched file is not changed, but otherwise circular dependency --> no solution yet
+    (case (get @model/app-state :state)
         0 [start-view]
         1 [waiting-view]
         2 [gameboard])])

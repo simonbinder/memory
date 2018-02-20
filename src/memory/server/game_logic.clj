@@ -1,8 +1,6 @@
 (ns memory.server.game-logic)
 
-
 (declare card-selected-handler cards-match? filter-turned-cards  filter-unresolved-cards)
-
 
 (defmulti forward-game-when determine-game-state)
 
@@ -44,7 +42,7 @@
     (assoc-in game [:deck] deck))
 
 (defn determine-game-state [game]
-   (let [{:keys [deck]} game
+   (let [game (:deck game)
          unresolved (filter-unresolved-cards deck)
          turned (filter-turned-cards unresolved)]
      (if (= 1 (count turned))

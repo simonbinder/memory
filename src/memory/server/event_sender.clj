@@ -8,9 +8,9 @@
     (doseq [uid (get-uids-of-game game)]
         (websocket/chsk-send! uid [:game/send-game-data game])))
 
-(defn multicast-event-to-participants-of-game [event game]
+(defn multicast-event-to-participants-of-game [event-id game]
     (doseq [uid (get-uids-of-game game)]
-        (websocket/chsk-send! uid [event message])))
+        (websocket/chsk-send! uid [event-id game])))
 
 (defn send-error-to-player [error-message uid]
     (websocket/chsk-send! uid [:error/game-not-found error-message]))

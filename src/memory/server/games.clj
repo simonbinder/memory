@@ -73,3 +73,6 @@ files-clean))))
 
 (defn get-game [id] (get @games id))
 (defn remove-game [game-id] (swap! dissoc game-id))
+
+(defn update-game [game-id changed-game]
+   (swap! game assoc game-id changed-game))

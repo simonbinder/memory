@@ -1,6 +1,7 @@
 (ns memory.server.eventhandler
   (:require
     [memory.server.games :as games]
+    [memory.server.game-logic game-logic]
     [memory.server.event-sender :as event-sender]))
 
 ;;----------- send-methods ------------------------
@@ -36,7 +37,9 @@
           (swap! games/users dissoc uid)
           (if (no-player-left? game)
               (-> game-id games/remove-game)
-              (multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game))))
+              (do
+                  (games/update-game game-id game)
+                  (multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game)))))
 
 (defn join-game-handler [uid game-id]
   (let [game (-> game-id games/get-game)]
@@ -45,7 +48,24 @@
             ;(throw (Exception. "Game does not exist."))))
          (do
              (games/add-player-to-game uid game-id)
-             (event-sender/multicast-game-to-participants game)))))
+             (event-sender/multicast-event-to-participants-of-game :game/send-game-data game)))))
+
+(defn card-selected-handler [client-game]
+  (let [updated-game (game-logic/forward-game-when client-game)
+        event-type (if (game-finished? updated-game)
+                             :game/game-finished
+                             :game/send-game-data)]
+       (games/update-game updated-game)
+       (event-sender/multicast-event-to-participants-of-game event-type updated-game)))
+
+
+
+
+
+
+
+
+
 
 
 
@@ -114,11 +134,13 @@
     turned-cards (get-turned-cards game)
     deck (get game :deck)]
   (doseq [card turned-cards]
+;;use changed-active-player instead of filter-active-player
     (swap! games/games assoc-in [game-id :deck (.indexOf (get game :deck) card) :resolved] (filter-active-player game))
   )
   (doseq [card deck]
     (swap! games/games assoc-in [game-id :deck (.indexOf (get game :deck) card) :turned] false)
   )
+;;Todo put change - active player to cards-not matching. use
   (swap! games/games assoc-in [game-id :active-player] (change-active-player game))
   (let [changed-game (get @games/games game-id)]
     (println "cards matching")

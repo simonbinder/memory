@@ -117,8 +117,6 @@
             (testing "...active player not changed."
                 (is (= (:active-player game) (:active-player new-game))))))
 
-
-
 (deftest forward-game-when-cards-not-matching
     (testing "FORWARD GAME WHEN CARDS NOT MATCHING "
         (let [game {:active-player 2 :deck [(get-card "x" true 0)(get-card "y" true 0)]}
@@ -129,6 +127,12 @@
                     (is (= (count-resolved-cards (:deck new-game)) (count-resolved-cards (:deck game)))))
                 (testing "...active player changed from 2 to 1."
                     (is (1 (:active-player new-game)))))))
+
+(deftest filter-turned-cards-test
+    (testing "FILTER TURNED CARDS: "
+        (testing "Given two cards, when one card is turned, only one is returned."
+            (let [deck [(get-card)(get-card "one" true 0)]]
+                (is (= 1 (count (filter-turned-cards deck))))))))
 
 (defn count-resolved-cards-of-player [deck player]
     (count (filter #(= (:resolved %) player)) deck))

@@ -55,7 +55,7 @@
     (-> game :deck filter-unresolved-cards count (= 0)))
 
 (defn filter-unresolved-cards [deck]
-      (filter #(= (% :resolved) 0) deck))
+      (filter #(= (:resolved %) 0) deck))
 
 (defn filter-turned-cards [deck]
       (filter #(:turned %) deck))

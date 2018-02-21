@@ -1,6 +1,33 @@
 (ns memory.server.game-logic)
 
-(declare card-selected-handler cards-match? filter-turned-cards  filter-unresolved-cards)
+(declare
+    determine-game-state
+    filter-turned-cards
+    cards-match?
+    forward-game-when
+    set-turned-cards-as-resolved-by
+    reset-turned-cards
+    change-active-player
+    update-deck-in-game
+    game-finished?
+    filter-unresolved-cards)
+
+
+(defn determine-game-state [game]
+   (let [turned (-> game :deck filter-turned-cards)]
+     (if (= 1 (count turned))
+       :first-card-selected
+       (if (cards-match? turned)
+           :cards-matching
+           :cards-not-matching))))
+
+(defn filter-turned-cards [deck]
+      (filter #(:turned %) deck))
+
+(defn cards-match? [[card-one card-two]]
+      (= (:url card-one) (:url card-two)))
+
+
 
 (defmulti forward-game-when determine-game-state)
 
@@ -23,11 +50,6 @@
           (update-deck-in-game client-game)
           (change-active-player))))
 
-(defn change-active-player [game]
-    (let [old-active-player (:active-player game)
-          new-active-player (- 3 old-active-player)]
-              (assoc-in game [:active-player] new-active-player)))
-
 (defn set-turned-cards-as-resolved-by [deck active-player]
     (doseq [card deck]
         (when (:turned card)
@@ -41,15 +63,13 @@
 (defn update-deck-in-game [deck game]
     (assoc-in game [:deck] deck))
 
-(defn determine-game-state [game]
-   (let [game (:deck game)
-         unresolved (filter-unresolved-cards deck)
-         turned (filter-turned-cards unresolved)]
-     (if (= 1 (count turned))
-       :first-card-selected
-       (if (cards-match? turned)
-           :cards-matching
-           :cards-not-matching))))
+(defn change-active-player [game]
+    (let [old-active-player (:active-player game)
+          new-active-player (- 3 old-active-player)]
+              (assoc-in game [:active-player] new-active-player)))
+
+
+
 
 (defn game-finished? [game]
     (-> game :deck filter-unresolved-cards count (= 0)))
@@ -57,15 +77,8 @@
 (defn filter-unresolved-cards [deck]
       (filter #(= (:resolved %) 0) deck))
 
-(defn filter-turned-cards [deck]
-      (filter #(:turned %) deck))
 
-(defn cards-match? [[card-one card-two]]
-      (= (:url card-one) (:url card-two)))
-
-
-
-____________----------____------
+;; --------------------------
 
 ;;TODO Do we need this?
 (defn validate-player-action [sender-uid game]

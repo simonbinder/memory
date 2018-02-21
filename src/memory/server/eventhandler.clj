@@ -1,7 +1,7 @@
 (ns memory.server.eventhandler
   (:require
     [memory.server.games :as games]
-    [memory.server.game-logic game-logic]
+    [memory.server.game-logic :as game-logic]
     [memory.server.event-sender :as event-sender]))
 
 ;;------------------- util-methods ------------------------
@@ -11,9 +11,15 @@
 
 
 (defn no-player-left? [game]
-  (every? nil? (-> game :players vals))
+  (every? nil? (-> game :players vals)))
 
 ;; ------------- handler ---------------------------------
+
+(defn create-game-handler [uid]
+    (if-let [game-id (games/get-game-id-for-uid uid)]
+        (event-sender/send-error-to-player (str "You are already associated with this game: " game-id "."))
+        (games/add-new-game uid)))
+
 (defn player-disconnected-handler [uid]
     (let [game-id (get @games/users uid)
           player-index (get-player-for-uid-from-game uid game-id)
@@ -25,7 +31,7 @@
               (-> game-id games/remove-game)
               (do
                   (games/update-game game-id game)
-                  (multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game)))))
+                  (event-sender/multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game)))))
 
 (defn join-game-handler [uid game-id]
   (let [game (-> game-id games/get-game)]

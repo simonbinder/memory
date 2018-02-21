@@ -15,9 +15,9 @@
 (defn multicast-event-to-game-dummy [event-id game-id](def dummy-fn-params [event-id game-id]))
 
 (defn count-turned-cards [deck] (count (filter #(:turned %) deck)))
-(defn count-resolved-cards-of-player [deck player](count (filter #(= (:resolved %) player)) deck))
+(defn count-resolved-cards-of-player [deck player](count (filter #(= (:resolved %) player) deck)))
 
-(defn get-game [] {
+(defn create-game-dummy [] {
     :deck [(get-card)(get-card)]})
 
 (defn get-card

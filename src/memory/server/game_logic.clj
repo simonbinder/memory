@@ -51,22 +51,24 @@
           (change-active-player))))
 
 (defn set-turned-cards-as-resolved-by [deck active-player]
-    (doseq [card deck]
-        (when (:turned card)
-            (assoc-in card [:resolved] active-player))))
+    (for [card deck]
+        (if (:turned card)
+            (assoc card :resolved active-player)
+            card)))
 
 (defn reset-turned-cards [deck]
-    (doseq [card deck]
-        (when (:turned card)
-            (assoc-in card [:turned] false))))
+    (for [card deck]
+        (if (:turned card)
+            (assoc card :turned false)
+            card)))
 
 (defn update-deck-in-game [deck game]
-    (assoc-in game [:deck] deck))
+    (assoc game :deck deck))
 
 (defn change-active-player [game]
     (let [old-active-player (:active-player game)
           new-active-player (- 3 old-active-player)]
-              (assoc-in game [:active-player] new-active-player)))
+              (assoc game :active-player new-active-player)))
 
 
 
@@ -80,12 +82,12 @@
 
 ;; --------------------------
 
+
+(defn get-active-player-uid [game]
+       ((:players game)(:active-player game)))
+
 ;;TODO Do we need this?
 (defn validate-player-action [sender-uid game]
   (if (not= sender-uid (get-active-player-uid game))
      (throw (.Exception (str "Event received from player "))))
 )
-
-
-(defn get-active-player-uid [game]
-       ((:players game)(:active-player game)))

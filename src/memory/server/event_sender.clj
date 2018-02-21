@@ -1,5 +1,6 @@
 (ns memory.server.event-sender
-[memory.server.websocket :as websocket])
+    (:require
+        [memory.server.websocket :as websocket]))
 
 (defn get-uids-of-game [game]
     (filter (vals (get game :players))))

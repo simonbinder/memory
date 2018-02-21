@@ -20,7 +20,7 @@
                 (is (= :cards-matching (determine-game-state game)))))
         (testing "Two Cards left, matching, but one turned."
             (let [game {:deck [(get-card "file_one" true 0)(get-card "file_one" false 0)]}]
-                 (is (= :cards-not-matching (determine-game-state game)))))))))
+                 (is (= :cards-not-matching (determine-game-state game)))))))
 
 (deftest test-reset-turned-cards
     (testing "TEST RESET TURNED CARDS: Given three cards, when returned, then all Cards have (= :turned false)."
@@ -40,7 +40,7 @@
             (let [game {:active-player 2 :deck [(get-card)(get-card)]}
                   actual (-> game change-active-player :active-player)
                   expected 1]
-                (is (= actual expected)))))
+                (is (= actual expected))))))
 
 (deftest set-turned-cards-as-resolved-by-test
     (testing "SET TURNED CARDS AS RESOLVED BY: "
@@ -71,7 +71,7 @@
                   expected true]
             (is (= actual expected))))
         (testing "Given three cards, when one card is (= resolved 0), then returns false"
-            (let [game {:deck [(get-card "one" true 1)(get-card "one" true 2)(get-card)]
+            (let [game {:deck [(get-card "one" true 1)(get-card "one" true 2)(get-card)]}
                   actual (game-finished? game)
                   expected false]
                 (is (= actual expected))))))
@@ -95,7 +95,7 @@
             (let [game {:deck 'noDeck}
                   deck [(get-card "one" true 0)(get-card "two" false 1)]
                   actual (-> deck (update-deck-in-game game) :deck first :url)
-                  expected "one"]#
+                  expected "one"]
                 (is (= actual expected))))))
 
 (deftest forward-game-when-first-card-selected
@@ -108,19 +108,19 @@
         (let [game {:active-player 1 :deck [(get-card)(get-card)(get-card "x" true 0)(get-card "x" true 0)]}
              new-game (forward-game-when game)]
             (testing "...new game contains 0 turned cards."
-                (is (= (count-turned-cards (:deck new-game)) 0))))
+                (is (= (count-turned-cards (:deck new-game)) 0)))
             (testing "...new game contains +2 resolved cards for player that was active."
                 (let [old-player (:active-player game)]
                     (is (=
                         (+ 2 (count-resolved-cards-of-player (:deck game) old-player))
                         (count-resolved-cards-of-player (:deck new-game) old-player)))))
             (testing "...active player not changed."
-                (is (= (:active-player game) (:active-player new-game))))))
+                (is (= (:active-player game) (:active-player new-game)))))))
 
 (deftest forward-game-when-cards-not-matching
     (testing "FORWARD GAME WHEN CARDS NOT MATCHING "
         (let [game {:active-player 2 :deck [(get-card "x" true 0)(get-card "y" true 0)]}
-             new-game (forward-game-whe game)]
+             new-game (forward-game-when game)]
                 (testing "...new game contains 0 turned cards. "
                     (is (= (count-turned-cards (:deck new-game)) 0)))
                 (testing "...new game's resolved cards amount does not change."
@@ -135,7 +135,7 @@
                 (is (= 1 (count (filter-turned-cards deck))))))))
 
 (defn count-resolved-cards-of-player [deck player]
-    (count (filter #(= (:resolved %) player)) deck))
+    (count (filter #(= (:resolved %) player) deck)))
 
 (defn count-resolved-cards [deck]
     (count (filter #(-> % :resolved (not= 0)) deck)))

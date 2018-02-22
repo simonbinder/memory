@@ -20,7 +20,7 @@
                 (is (= :cards-matching (determine-game-state game)))))
         (testing "Two Cards left, matching, but one turned."
             (let [game {:deck [(get-card "file_one" true 0)(get-card "file_one" false 0)]}]
-                 (is (= :cards-not-matching (determine-game-state game)))))))
+                 (is (not= :cards-not-matching (determine-game-state game)))))))
 
 (deftest test-reset-turned-cards
     (testing "TEST RESET TURNED CARDS: Given three cards, when returned, then all Cards have (= :turned false)."
@@ -58,7 +58,7 @@
                   expected 0]
                 (is (= actual expected))))
         (testing "Given three cards, when two cards have (= resolved 0), then both are returned."
-            (let [deck [(get-card "Some")(get-card)(get-card)]
+            (let [deck [(get-card "Some" true 1)(get-card)(get-card)]
                   actual (-> deck filter-unresolved-cards count)
                   expected 2]
                 (is (= actual expected))))))
@@ -126,7 +126,7 @@
                 (testing "...new game's resolved cards amount does not change."
                     (is (= (count-resolved-cards (:deck new-game)) (count-resolved-cards (:deck game)))))
                 (testing "...active player changed from 2 to 1."
-                    (is (1 (:active-player new-game)))))))
+                    (is (= 1 (:active-player new-game)))))))
 
 (deftest filter-turned-cards-test
     (testing "FILTER TURNED CARDS: "

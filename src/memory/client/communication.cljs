@@ -2,9 +2,9 @@
   (:require-macros
    [cljs.core.async.macros :as asyncm :refer (go go-loop)])
   (:require
+    [memory.client.eventhandler :as eventhandler]
    [cljs.core.async :as async :refer (<! >! put! chan)]
    [taoensso.sente  :as sente :refer (cb-success?)]))
-
 
 (defn get-chsk-url
     "Connect to a configured server instead of the page host"
@@ -36,19 +36,20 @@
   ;; now, comes wrapped in sente.
   [{:as ev-msg :keys [?data]}]
   (let [[message-type message-payload] ?data]
-    ; (if (= message-type :test-push/hello)
-     (println ?data)))
+     (case message-type
+       :game/send-game-data (eventhandler/receive-game (nth ?data 1))
+       (println ?data))))
 
-(defn send-hello []
-  (chsk-send! [:test/id1 {:hello "hello"}]))
+(defn send-game [client-game]
+  (chsk-send! [:game/selected-card {:game client-game}]))
 
 (defn print-reply [reply] (println reply))
 
-(defn create-game[]
-  (chsk-send! [:game/create-game {:game "game"}] 8000 print-reply))
+(defn create-game [start-game-reply]
+  (chsk-send! [:game/create-game {:game "game"}] 8000 start-game-reply))
 
-(defn join-game [game-id]
-  (chsk-send! [:game/join-game {:game-id game-id}]))
+(defn join-game [game-id join-game-reply]
+  (chsk-send! [:game/join-game {:game-id game-id}] 8000 join-game-reply))
 
 (defmethod event-msg-handler :chsk/handshake [{:as ev-msg :keys [?data]}]
     (let [[?uid ?csrf-token ?handshake-data] ?data]

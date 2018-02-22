@@ -2,34 +2,10 @@
     (:require
       [reagent.core :as reagent :refer [atom]]
       [memory.client.model :as model]
-      [memory.client.communication :as communication]))
+      [memory.client.communication :as communication]
+      [memory.client.eventsender :as eventsender]))
 
 (enable-console-print!)
-
-(defn set-game-id [game-id]
-  (swap! model/app-state assoc :game-id (str game-id)))
-
-(defn start-game-reply [reply]
-  (print reply)
-  (let [game-id (get reply :game-id)]
-  (set-game-id game-id)
-  (swap! model/app-state assoc :state 1)))
-
-(defn join-game-reply [reply]
-  ;(let [deck (get (get reply 2) :deck)]
-  (print "join-game-reply" reply)
-  ;(print "deck" deck)
-  ;(swap! game assoc :deck deck)
-  )
-
-(defn join-game [game-id]
-  (print game-id)
-  (set-game-id game-id)
-  (communication/join-game game-id join-game-reply))
-
-;; not implemented yet
-(defn handle-click []
-  (communication/send-game @model/game))
 
 (defn start-view []
   (let [input-value (atom "")]
@@ -39,12 +15,12 @@
               :value "Spiel starten"
               :on-click
                 (fn [e]
-                  (communication/create-game start-game-reply))}]
+                  (communication/create-game eventsender/start-game-reply))}]
     [:input  {:type "button"
               :value "Spiel beitreten"
               :on-click
                 (fn [e]
-                  (join-game @input-value))}]
+                  (eventsender/join-game @input-value))}]
     [:input {:type "text"
              :value @input-value
              :on-change #(reset! input-value (-> % .-target .-value))}]])))
@@ -54,10 +30,17 @@
     [:p "Schicke die unten angegebene Game-ID an einen Freund. Sobald dieser dem Spiel beitritt kann das Spiel beginnen."]
     [:p (str "Game-ID: "(:game-id @model/app-state))]])
 
+;; hack to get relative paths
+(defn replace-path [image-path]
+  (let [escaped-path (clojure.string/replace image-path #".\\resources\\public" "..\\..")]
+  (print escaped-path)
+  escaped-path))
+
 (defn card-item-open []
   (fn [{:keys [title, turned]}]
     [:li
-      [:img {:src "http://media.einfachtierisch.de/thumbnail/600/0/media.einfachtierisch.de/images/2013/01/Junge-Katze-Erziehen.jpg"}]]))
+    ;; TODO display all open cards
+      [:img {:src (replace-path  (:url (nth (:deck @model/game)1)))}]]))
 
 (defn card-item-closed []
   (fn [{:keys [title, turned]}]

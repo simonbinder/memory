@@ -1,6 +1,6 @@
 (ns memory.client.model
   (:require
-    [reagent.core :as reagent]))
+    [reagent.core :as reagent :refer [atom]]))
 
 (defonce game (atom
           {:active-player 1
@@ -25,4 +25,4 @@
 ;; 0 -> not started (options start new game or join)
 ;; 1 -> started (waiting for second player)
 ;; 2 -> started (game can begin)
-(defonce app-state (atom {:state 0 :game-id ""}))  
+(defonce app-state (atom {:state 0 :game-id ""}))

@@ -81,8 +81,7 @@
 (defn main-view []
   [:div
     [:h1 "Memory"]
-    ;; reload is not working because atom watched file is not changed, but otherwise circular dependency --> no solution yet
-    (case (get @model/app-state :state)
+    (case (:state @model/app-state)
         0 [start-view]
         1 [waiting-view]
         2 [gameboard])])

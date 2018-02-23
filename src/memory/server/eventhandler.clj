@@ -26,6 +26,8 @@
           game (-> game-id
                    games/get-game
                    (assoc-in [:players player-index] nil))]
+          (println "User disconnected:")
+          (println player-index)
           (swap! games/users dissoc uid)
           (if (no-player-left? game)
               (-> game-id games/remove-game)

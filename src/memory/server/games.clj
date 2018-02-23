@@ -47,15 +47,18 @@ files-clean))))
         (get (get @games game-id) :players) [player-key])))))
 
 (defn add-player-to-game [uid game-id]
-  (if (nil? (get @games game-id))
-    (throw (Exception. "Game does not exist."))
+  (if-let [game (get @games game-id)]
+
     (if (player-nil? 1 game-id)
-      ((swap! games assoc-in [game-id :players 1] uid)
-      (swap! users assoc-in [uid] game-id))
+      (do
+          (swap! games assoc-in [game-id :players 1] uid)
+          (swap! users assoc-in [uid] game-id))
       (if (player-nil? 2 game-id)
-        ((swap! games assoc-in [game-id :players 2] uid)
-         (swap! users assoc-in [uid] game-id))
-         (throw (Exception. "There are already two players participating in this game."))))))
+          (do
+              (swap! games assoc-in [game-id :players 2] uid)
+              (swap! users assoc-in [uid] game-id))
+          (throw (Exception. "There are already two players participating in this game."))))))
+    (throw (Exception. "Game does not exist."))
 
 (defn create-new-game [player-one-uid]
     {

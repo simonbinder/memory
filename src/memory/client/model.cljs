@@ -25,4 +25,4 @@
 ;; 0 -> not started (options start new game or join)
 ;; 1 -> started (waiting for second player)
 ;; 2 -> started (game can begin)
-(defonce app-state (atom {:state 0 :game-id ""}))
+(defonce app-state (atom {:state 0 :game-id "" :player-number 0 :player-uid ""}))

@@ -25,4 +25,16 @@
 ;; 0 -> not started (options start new game or join)
 ;; 1 -> started (waiting for second player)
 ;; 2 -> started (game can begin)
-(defonce app-state (atom {:state 0 :game-id ""}))
+(defonce app-state (atom {:state 0 :game-id "" :player-number 0 :player-uid ""}))
+
+(defonce game-count (atom {:own-score 0 :opponent-score 0}))
+
+(defn count-unresolved-cards [deck player-number]
+      ( / (count (filter #(= (% :resolved) player-number) deck)) 2))
+
+(defn calc-game-count []
+        (let [deck (get @game :deck)
+        player-number (:player-number @app-state)
+        opponent-number (if (= player-number 1) 2 1)
+        own-score (count-unresolved-cards deck player-number)
+        opponent-score (count-unresolved-cards deck opponent-number)] [own-score opponent-score]))

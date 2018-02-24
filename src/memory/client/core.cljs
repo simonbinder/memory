@@ -55,11 +55,17 @@
 
 (defn gameboard []
     (let [game @model/game
-          cards (get game :deck)]
-      [:div#gameboard
-        [:ul#card-list {:style {:width "600px"}}
+          cards (get game :deck)
+          own-score (:own-score @model/game-count)
+          opponent-score (:opponent-score @model/game-count)]
+    [:div
+      [:div {:class "score"}
+      [:p "Your score is: " own-score]
+      [:p "The opponent score is: " opponent-score]]
+      [:div#gameboard  {:class "gameboard"}
+        [:ul#card-list
         (for [card cards]
-             ^{:key (:id card)} [card-item card])]]))
+             ^{:key (:id card)} [card-item card])]]]))
 
 (defn main-view []
   [:div

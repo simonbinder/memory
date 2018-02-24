@@ -13,6 +13,7 @@
   (swap! model/app-state assoc :state 1)))
 
 (defn join-game-reply [reply]
+  ;(swap! model/app-state assoc :state 2)
   ;(let [deck (get (get reply 2) :deck)]
   (print "join-game-reply" reply)
   ;(print "deck" deck)
@@ -22,7 +23,8 @@
 (defn join-game [game-id]
   (print game-id)
   (set-game-id game-id)
-  (communication/join-game game-id join-game-reply))
+  (communication/join-game game-id join-game-reply)
+  )
 
 ;; not implemented yet
 (defn handle-click []

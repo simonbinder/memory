@@ -59,10 +59,19 @@ files-clean))))
     (if-let [game (get @games game-id)]
         (if-let [nil-player-index (get-nil-player-index game)]
             (do
-                (swap! users assoc-in [uid] game-id)
+                (swap! users assoc uid game-id)
                 (swap! games assoc-in [game-id :players nil-player-index] uid))
             (throw (Exception. "There are already two players participating in this game.")))
         (throw (Exception. "Game does not exist."))))
+
+(defn update-users-game-id [uid game-id]
+    (swap! users assoc uid game-id))
+
+;; Not used
+(defn add-player-to-game-pure-fn [uid game]
+    (if-let [nil-player-index (get-nil-player-index game)]
+        (assoc-in game [:players nil-player-index] uid))
+    (throw (Exception. "There are already two players participating in this game.")))
 
 (defn create-new-game [player-one-uid]
     {
@@ -74,7 +83,7 @@ files-clean))))
 (defn add-new-game [uid]
   (let [game-id (create-game-id uid) game (create-new-game uid)]
     (swap! games assoc-in [game-id] game)
-    (swap! users assoc-in [uid] game-id)
+    (swap! users assoc uid game-id)
     game-id
    ))
 

@@ -34,13 +34,12 @@
                   (event-sender/multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game)))))
 
 (defn join-game-handler [uid game-id]
-  (let [game (-> game-id games/get-game)]
-      (if (nil? game)
-         (event-sender/send-error-to-player "Game does not exist")
-            ;(throw (Exception. "Game does not exist."))))
-         (do
-             (games/add-player-to-game uid game-id)
-             (event-sender/multicast-game-to-participants :game/send-game-data game)))))
+    (if-let [game (-> game-id games/get-game)]
+        (let [updated-game (games/add-player-to-game-pure-fn uid game)]
+            (event-sender/multicast-game-to-participants :game/send-game-data updated-game)
+            (games/update-game updated-game)
+            (games/update-users-game-id uid game-id))
+        (event-sender/send-error-to-player "Game does not exist")))
 
 (defn card-selected-handler [client-game]
   (let [updated-game (game-logic/forward-game-when client-game)

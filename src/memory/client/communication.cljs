@@ -53,7 +53,8 @@
 
 (defmethod event-msg-handler :chsk/handshake [{:as ev-msg :keys [?data]}]
     (let [[?uid ?csrf-token ?handshake-data] ?data]
-      (println "Handshake:" ?data)))
+      (println "Handshake:" ?data)
+      (eventhandler/set-uid ?uid)))
 
 (defonce router
     (sente/start-client-chsk-router! ch-chsk event-msg-handler))

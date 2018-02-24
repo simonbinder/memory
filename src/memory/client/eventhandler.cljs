@@ -19,5 +19,9 @@
          (println "Server-Game: " server-game)
          (swap! model/game assoc :deck deck)
          (swap! model/game assoc :active-player active-player)
+         (let [[own-score opponent-score] (model/calc-game-count)]
+         (swap! model/game-count assoc :own-score own-score)
+         (swap! model/game-count assoc :opponent-score opponent-score))
          (println "Client-Game: "@model/game)
+         (println "Game-count "@model/game-count)
          (println @model/app-state)))

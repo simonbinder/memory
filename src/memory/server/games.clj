@@ -46,16 +46,23 @@ files-clean))))
   (nil? (first (vals (select-keys
         (get (get @games game-id) :players) [player-key])))))
 
+(defn player-nil? [game player-key]
+    (get-in game [:players player-key]))
+
+(defn get-nil-player-index [game]
+    (if-let [nil-player (first (filter #(-> % last nil?) (-> game :players seq)))]
+       (first nil-player)
+       nil))
+; with always one player connected, it returns first player-index with nil
+
 (defn add-player-to-game [uid game-id]
-  (if (nil? (get @games game-id))
-    (throw (Exception. "Game does not exist."))
-    (if (player-nil? 1 game-id)
-      ((swap! games assoc-in [game-id :players 1] uid)
-      (swap! users assoc-in [uid] game-id))
-      (if (player-nil? 2 game-id)
-        ((swap! games assoc-in [game-id :players 2] uid)
-         (swap! users assoc-in [uid] game-id))
-         (throw (Exception. "There are already two players participating in this game."))))))
+    (if-let [game (get @games game-id)]
+        (if-let [nil-player-index (get-nil-player-index game)]
+            (do
+                (swap! users assoc-in [uid] game-id)
+                (swap! games assoc-in [game-id :players nil-player-index] uid))
+            (throw (Exception. "There are already two players participating in this game.")))
+        (throw (Exception. "Game does not exist."))))
 
 (defn create-new-game [player-one-uid]
     {
@@ -70,3 +77,12 @@ files-clean))))
     (swap! users assoc-in [uid] game-id)
     game-id
    ))
+
+(defn get-game-id-for-uid [uid]
+    (get @users uid))
+
+(defn get-game [id] (get @games id))
+(defn remove-game [game-id] (swap! games dissoc game-id))
+
+(defn update-game [game-id changed-game]
+   (swap! games assoc game-id changed-game))

@@ -9,96 +9,37 @@
 
 (declare get-card multicast-event-to-game-dummy)
 
-(deftest test-determine-game-state
+(defn get-game-id-for-uid-dummy [uid]
+    (if (>= uid 0)
+        nil
+        1))
 
-   (testing "Finished game: "
-      (testing "Two unresolved cards left, one card turned."
-          (let [game {:deck [(get-card)(get-card "file_one" true 0)]}]
-              (is (= :first-card-selected (determine-game-state game)))))
-      (testing "Two unresolved cards left, both cards opened."
-          (let [game {:deck [(get-card "file_one" true 0)(get-card "file_one" true 0)]}]
-              (is (= :game-finished (determine-game-state game)))))
-      (testing "4 unresolved cards left, two macthing cards turned."
-          (let [game {:deck [(get-card "file_one" false 1)(get-card "file_one" false 1)(get-card "file_two" true 0)(get-card "file_two" true 0)]}]
-              (is (= :game-finished (determine-game-state game))))))
-    (testing "CARDS NOT MATCHING: "
-       (testing "4 unresolved cards in deck, two cards turned and not matching."
-           (let [game {:deck [(get-card)(get-card)(get-card "one" true 0)(get-card "two" true 0)]}]
-               (is (= :cards-not-matching (determine-game-state game)))))))
+(defn add-new-game-dummy [uid] uid)
 
-
-(deftest filter-unresolved-cards-test
-   (testing "FILTER UNRESOLVED CARDS: "
-       (testing "one resolved. one unresolved."
-            (let [cards [(get-card) (get-card "any" false 1)]
-                  expected (vals (first cards))
-                  actual (vals (first (filter-unresolved-cards cards)))]
-                 (println actual)
-                 (is (= expected actual))))))
-
-(deftest filter-turned-cards-test
-    (testing "FILTER TURNED CARDS: "
-        (testing "One turned, one not turned."
-            (let [deck [(get-card)(get-card "one" true 0)]]
-                (is (= 1 (count (filter-turned-cards deck))))))))
-
-(deftest forward-game-when-first-card-selected
-    (testing "FORWARD GAME WHEN FIRST CARD SELECTED"
-        (testing "Game is multicasted to Clients."
-            (declare dummy-fn-params)
-            (let game {:deck [(get-card "y" false 0)(get-card "x" true 0)]}]
-                      (forward-game-when multicast-event-to-game-dummy game TODOmissingparam)
-                      (is (= [:game/send-game-data new-game] dummy-fn-params))))))
-
-(deftest forward-game-when-cards-matching
-    (testing "FORWARD GAME WHEN CARDS MATCHING "
-        (declare dummy-fn-params)
-        (let [game {:deck [(get-card)(get-card)(get-card "x" true 0)(get-card "x" true 0)]}
-             new-game (forward-game-when multicast-event-to-game-dummy game TODOMissingParam)]
-            (testing "...game is multicasted to clients. "
-                (is (= [:game/send-game-data new-game] dummy-fn-params)))
-            (testing "...new game contains 0 turned cards."
-                (is (= (count-turned-cards (:deck new-game)) (count-turned-cards (:deck game)))))
-            (testing "...new game contains +2 resolved cards for player that was active."
-                (let [old-player (:active-player game)]
-                    (is (= (+ 2 (count-resolved-cards-of-player (:deck game) old-player)) (count-resolved-cards-of-player (:deck new-game) old-player)))))
-            (testing "...active player not changed."
-                (is (= (:active-player game) (:active-player new-game))))))
-
-(deftest forward-game-when-cards-matching
-    (testing "FORWARD GAME WHEN CARDS NOT MATCHING "
-        (declare dummy-fn-params)
-        (let [game {:deck [(get-card "x" true 0)(get-card "y" true 0)]}
-             new-game (forward-game-when multicast-event-to-game-dummy game TODOMissingParam)]
-                (testing "...game is multicast to clients"
-                    (is (= dummy-fn-params [:game/send-game-data new-game])))
-                (testing "...new game contains 0 turned cards. "
-                    (is (= (count-turned-cards (:deck new-game)) (count-turned-cards (:deck game)))))
-                (testing "...new game's resolved cards amount does not change."
-                    (is (= (count-resolved-cards (:deck new-game)) (count-resolved-cards (:deck game)))))
-                (testing "...active player changed."
-                    (is (not= (:active-player game) (:active-player new-game)))))))
-
-(deftest forward-game-when-game-finished
-    (testing "FORWARD GAME WHEN GAME FINISHED"
-        (declare dummy-fn-params)
-        (let [game {:deck [(get-card "x" false 1)(get-card "x" false 1)(get-card "y" true 0)(get-card "y" true 0)]}
-             new-game (forward-game-when multicast-event-to-game-dummy game TODOMissingParam)]
-                 (testing "...game is multicasted to clients with game-finished event."
-                     (is (= dummy-fn-params [:game/game-finished new-game])))
-                 (testing "...new game contains 0 turned cards."
-                     (is (= (count-turned-cards (:deck new-game)) (count-turned-cards (:deck game)))))
-                 (testing "...new game contains +2 resolved cards for player that was active."
-                     (let [old-player (:active-player game)]
-                         (is (= (+ 2 (count-resolved-cards-of-player (:deck game) old-player)) (count-resolved-cards-of-player (:deck new-game) old-player)))))))
+(defn send-error-to-player-dummy [message] message)
+(comment
+(deftest create-game-handler-test
+    (testing "CREATE GAME HANDLER: "
+        (binding [get-game-id-for-uid get-game-id-for-uid-dummy
+                  add-new-game add-new-game-dummy
+                  send-error-to-player send-error-to-player-dummy]
+            (testing "When called with non-pre-existing uid, then games/add-new-game is called with given uid."
+                (let [expected-uid 10
+                      actual-uid create-game-handler expected-uid]
+                    (is (= actual-uid expected-uid))))
+            (testing "When called with pre-existing-uid, then event-sender/send-error-to-player is called with expected message and game-id."
+                (let [expected "You are already associated with this game: 1."
+                      actual create-game-handler -1])))))
+)
+;(deftest card-selected-handler-test ())
 
 ;; HELPERS --------------------------------
 (defn multicast-event-to-game-dummy [event-id game-id](def dummy-fn-params [event-id game-id]))
 
 (defn count-turned-cards [deck] (count (filter #(:turned %) deck)))
-(defn count-resolved-cards-of-player [deck player](count (filter #(= (:resolved %) player)) deck))
+(defn count-resolved-cards-of-player [deck player](count (filter #(= (:resolved %) player) deck)))
 
-(defn get-game [] {
+(defn create-game-dummy [] {
     :deck [(get-card)(get-card)]})
 
 (defn get-card

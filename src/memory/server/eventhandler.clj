@@ -26,8 +26,6 @@
           game (-> game-id
                    games/get-game
                    (assoc-in [:players player-index] nil))]
-          (println "User disconnected:")
-          (println player-index)
           (swap! games/users dissoc uid)
           (if (no-player-left? game)
               (-> game-id games/remove-game)
@@ -42,7 +40,7 @@
             ;(throw (Exception. "Game does not exist."))))
          (do
              (games/add-player-to-game uid game-id)
-             (event-sender/multicast-event-to-participants-of-game :game/send-game-data game)))))
+             (event-sender/multicast-game-to-participants :game/send-game-data game)))))
 
 (defn card-selected-handler [client-game]
   (let [updated-game (game-logic/forward-game-when client-game)
@@ -50,7 +48,7 @@
                              :game/game-finished
                              :game/send-game-data)]
        (games/update-game updated-game)
-       (event-sender/multicast-event-to-participants-of-game event-type updated-game)))
+       (event-sender/multicast-game-to-participants event-type updated-game)))
 
 
 ;; For testing demo

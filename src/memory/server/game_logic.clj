@@ -32,7 +32,7 @@
 (defmulti forward-game-when determine-game-state)
 
 (defmethod forward-game-when :first-card-selected [client-game]
-  (println "first cards selected"))
+  client-game)
 
 (defmethod forward-game-when :cards-matching [client-game]
     (let [deck (get client-game :deck)

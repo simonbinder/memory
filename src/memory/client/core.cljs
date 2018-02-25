@@ -30,6 +30,11 @@
     [:p "Schicke die unten angegebene Game-ID an einen Freund. Sobald dieser dem Spiel beitritt kann das Spiel beginnen."]
     [:p (str "Game-ID: "(:game-id @model/app-state))]])
 
+(defn disconnected-view []
+      [:div#waiting-view
+        [:p "Dein Mitspieler hat das Spiel verlassen. Schicke die untenstehende ID an einen Freund und das Spiel kann fortgesetzt werden."]
+        [:p (str "Game-ID: "(:game-id @model/app-state))]])
+
 ;; hack to get relative paths
 (defn replace-path [image-path]
   (let [escaped-path (clojure.string/replace image-path #".\\resources\\public" "..\\..")]
@@ -73,7 +78,8 @@
     (case (:state @model/app-state)
         0 [start-view]
         1 [waiting-view]
-        2 [gameboard])])
+        2 [gameboard]
+        3 [disconnected-view])])
 
 
 (reagent/render-component [main-view]

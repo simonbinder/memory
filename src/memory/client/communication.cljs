@@ -38,6 +38,7 @@
   (let [[message-type message-payload] ?data]
      (case message-type
        :game/send-game-data (eventhandler/receive-game (nth ?data 1))
+       :game/waiting-for-player (eventhandler/set-to-wait)
        (println ?data))))
 
 (defn send-game [client-game]

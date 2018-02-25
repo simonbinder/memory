@@ -4,8 +4,8 @@
 
 (defn get-player-number[game]
       (let [uid (:player-uid @model/app-state)
-        players (get game :players)
-       player-number (first (filter (comp #{uid} players) (keys players)))]
+            players (get game :players)
+            player-number (first (filter (comp #{uid} players) (keys players)))]
       player-number))
 
 (defn set-uid [uid]

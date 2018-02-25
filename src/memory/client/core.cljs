@@ -86,6 +86,8 @@
 (defn main-view []
   [:div
     [:h1 "Memory"]
+    (if (not= @model/error "")
+      [:p#error @model/error])
     (case (:state @model/app-state)
         0 [start-view]
         1 [waiting-view]

@@ -25,3 +25,6 @@
          (println "Client-Game: "@model/game)
          (println "Game-count "@model/game-count)
          (println @model/app-state)))
+
+(defn set-to-wait []
+        (swap! model/app-state assoc :state 3))

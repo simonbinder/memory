@@ -25,6 +25,7 @@
 ;; 0 -> not started (options start new game or join)
 ;; 1 -> started (waiting for second player)
 ;; 2 -> started (game can begin)
+;; 3 -> player disconnected (waiting for second player)
 (defonce app-state (atom {:state 0 :game-id "" :player-number 0 :player-uid "" :turned-cards 0}))
 
 (defonce game-count (atom {:own-score 0 :opponent-score 0}))

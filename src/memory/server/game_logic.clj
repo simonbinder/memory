@@ -63,15 +63,13 @@
             card)))
 
 (defn update-deck-in-game [deck game]
-    (assoc game :deck deck))
+    (let [vector-deck (into [] deck)]
+    (assoc game :deck vector-deck)))
 
 (defn change-active-player [game]
     (let [old-active-player (:active-player game)
           new-active-player (- 3 old-active-player)]
               (assoc game :active-player new-active-player)))
-
-
-
 
 (defn game-finished? [game]
     (-> game :deck filter-unresolved-cards count (= 0)))

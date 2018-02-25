@@ -28,8 +28,6 @@
     (println (:game-id ?data))
     (eventhandler/join-game-handler uid (:game-id ?data)))
 
-
-
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
 

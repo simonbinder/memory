@@ -30,6 +30,8 @@
 
 (defonce game-count (atom {:own-score 0 :opponent-score 0}))
 
+(defonce error (atom ""))
+
 (defn count-unresolved-cards [deck player-number]
       ( / (count (filter #(= (% :resolved) player-number) deck)) 2))
 
@@ -58,3 +60,9 @@
   (if (= (:player-number @app-state) (:active-player @game))
    "It's your turn"
    "It's NOT your turn"))
+
+(defn show-error [error-message]
+  (reset! error error-message))
+
+(defn clear-error []
+  (reset! error ""))

@@ -7,10 +7,12 @@
   (swap! model/app-state assoc :game-id (str game-id)))
 
 (defn start-game-reply [reply]
-  (print reply)
   (let [game-id (get reply :game-id)]
-  (set-game-id game-id)
-  (swap! model/app-state assoc :state 1)))
+  (if (nil? game-id)
+    (model/show-error "No Server-Connection")
+    (do
+      (set-game-id game-id)
+      (swap! model/app-state assoc :state 1)))))
 
 (defn join-game-reply [reply]
   ;(swap! model/app-state assoc :state 2)

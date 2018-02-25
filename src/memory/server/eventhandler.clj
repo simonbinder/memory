@@ -48,6 +48,7 @@
         event-type (if (game-logic/game-finished? updated-game)
                              :game/game-finished
                              :game/send-game-data)]
+       (println updated-game)
        (games/update-game (games/get-game-id-for-uid uid) updated-game)
        (event-sender/multicast-game-to-participants event-type updated-game)))
 

@@ -38,3 +38,9 @@
         opponent-number (if (= player-number 1) 2 1)
         own-score (count-unresolved-cards deck player-number)
         opponent-score (count-unresolved-cards deck opponent-number)] [own-score opponent-score]))
+
+(defn turn-card [id]
+  (let [deck  (get @game :deck)
+        id-vec (vec (map :id deck))
+        index (.indexOf (vec (map :id deck)) id)]
+      (swap! game update-in [:deck index] assoc :turned true)))

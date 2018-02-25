@@ -26,7 +26,7 @@
 ;; 1 -> started (waiting for second player)
 ;; 2 -> started (game can begin)
 ;; 3 -> player disconnected (waiting for second player)
-(defonce app-state (atom {:state 0 :game-id "" :player-number 0 :player-uid ""}))
+(defonce app-state (atom {:state 0 :game-id "" :player-number 0 :player-uid "" :turned-cards 0}))
 
 (defonce game-count (atom {:own-score 0 :opponent-score 0}))
 
@@ -39,3 +39,22 @@
         opponent-number (if (= player-number 1) 2 1)
         own-score (count-unresolved-cards deck player-number)
         opponent-score (count-unresolved-cards deck opponent-number)] [own-score opponent-score]))
+
+(defn turn-card [id]
+  (let [deck  (get @game :deck)
+        id-vec (vec (map :id deck))
+        index (.indexOf (vec (map :id deck)) id)]
+      (swap! game update-in [:deck index] assoc :turned true)
+      (swap! app-state update-in [:turned-cards] inc)))
+
+(defn check-if-player-is-allowed-to-turn-card [id]
+  (if (and (= (:player-number @app-state) (:active-player @game)) (> 2 (:turned-cards @app-state)))
+    (do
+      (turn-card id)
+      true)
+      false))
+
+(defn check-if-is-the-players-turn []
+  (if (= (:player-number @app-state) (:active-player @game))
+   "It's your turn"
+   "It's NOT your turn"))

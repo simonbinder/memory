@@ -7,6 +7,10 @@
 
 (enable-console-print!)
 
+(defn turn-card-if-player-is-allowed-to [id]
+  (if (model/check-if-player-is-allowed-to-turn-card id)
+    (eventsender/handle-click)))
+
 (defn start-view []
   (let [input-value (atom "")]
   (fn []
@@ -41,32 +45,39 @@
   (print escaped-path)
   escaped-path))
 
-(defn card-item-open []
-  (fn [{:keys [title, turned]}]
+(defn card-item-open [card]
+  (fn [{:keys [url]}]
     [:li
     ;; TODO display all open cards
-      [:img {:src (replace-path  (:url (nth (:deck @model/game)1)))}]]))
+    ;; [:img {:src (replace-path  (:url (nth (:deck @model/game)1)))}]]))
+    ;; [:img {:src (replace-path url)}]]))
+      [:img {:src "https://images-na.ssl-images-amazon.com/images/I/51B-5V0LYLL._SL1418_.jpg"}]]))
 
-(defn card-item-closed []
-  (fn [{:keys [title, turned]}]
-    [:li ]))
+(defn card-item-closed [card]
+  (fn [{:keys [id]}]
+    [:li
+    {:on-click
+      (fn [e]
+        (turn-card-if-player-is-allowed-to id))}]))
 
 (defn card-item [card]
-  (fn [{:keys [title, turned]}]
+  (fn [{:keys [turned, id]}]
     (if (true? turned)
       [card-item-open card]
-      [card-item-closed]
+      [card-item-closed card]
       )))
 
 (defn gameboard []
     (let [game @model/game
           cards (get game :deck)
           own-score (:own-score @model/game-count)
-          opponent-score (:opponent-score @model/game-count)]
+          opponent-score (:opponent-score @model/game-count)
+          player (:player-number @model/app-state)]
     [:div
       [:div {:class "score"}
       [:p "Your score is: " own-score]
-      [:p "The opponent score is: " opponent-score]]
+      [:p "The opponent score is: " opponent-score]
+      [:p (model/check-if-is-the-players-turn)]]
       [:div#gameboard  {:class "gameboard"}
         [:ul#card-list
         (for [card cards]

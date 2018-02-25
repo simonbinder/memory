@@ -36,7 +36,7 @@
 (defn join-game-handler [uid game-id]
     (if-let [game (-> game-id games/get-game)]
         (try
-            (let [updated-game (games/add-player-to-game-pure-fn uid game)]
+            (let [updated-game (games/add-player-to-game uid game)]
                 (event-sender/multicast-game-to-participants :game/send-game-data updated-game)
                 (games/update-game game-id updated-game)
                 (games/update-users-game-id uid game-id))

@@ -7,6 +7,10 @@
 
 (enable-console-print!)
 
+(defn turn-card-if-player-is-allowed-to [id]
+  (if (model/check-if-player-is-allowed-to-turn-card id)
+    (eventsender/handle-click)))
+
 (defn start-view []
   (let [input-value (atom "")]
   (fn []
@@ -49,7 +53,7 @@
     [:li
     {:on-click
       (fn [e]
-        (model/turn-card id))}]))
+        (turn-card-if-player-is-allowed-to id))}]))
 
 (defn card-item [card]
   (fn [{:keys [turned, id]}]
@@ -62,11 +66,13 @@
     (let [game @model/game
           cards (get game :deck)
           own-score (:own-score @model/game-count)
-          opponent-score (:opponent-score @model/game-count)]
+          opponent-score (:opponent-score @model/game-count)
+          player (:player-number @model/app-state)]
     [:div
       [:div {:class "score"}
       [:p "Your score is: " own-score]
-      [:p "The opponent score is: " opponent-score]]
+      [:p "The opponent score is: " opponent-score]
+      [:p (model/check-if-is-the-players-turn)]]
       [:div#gameboard  {:class "gameboard"}
         [:ul#card-list
         (for [card cards]

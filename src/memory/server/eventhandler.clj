@@ -17,7 +17,7 @@
 
 (defn create-game-handler [uid]
     (if-let [game-id (games/get-game-id-for-uid uid)]
-        (event-sender/send-error-to-player (str "You are already associated with this game: " game-id "."))
+        (event-sender/send-error-to-player [:error/one-player-two-games(str "You are already associated with this game: " game-id ".")] uid)
         (games/add-new-game uid)))
 
 (defn player-disconnected-handler [uid]
@@ -34,20 +34,21 @@
                   (event-sender/multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game)))))
 
 (defn join-game-handler [uid game-id]
-  (let [game (-> game-id games/get-game)]
-      (if (nil? game)
-         (event-sender/send-error-to-player "Game does not exist")
-            ;(throw (Exception. "Game does not exist."))))
-         (do
-             (games/add-player-to-game uid game-id)
-             (event-sender/multicast-game-to-participants :game/send-game-data game)))))
+    (if-let [game (-> game-id games/get-game)]
+        (try
+            (let [updated-game (games/add-player-to-game-pure-fn uid game)]
+                (event-sender/multicast-game-to-participants :game/send-game-data updated-game)
+                (games/update-game game-id updated-game)
+                (games/update-users-game-id uid game-id))
+            (catch Exception e (event-sender/send-error-to-player [:error/too-many-players-in-game (.getMessage e)] uid)))
+        (event-sender/send-error-to-player [:error/game-not-found "Game does not exist"] uid)))
 
-(defn card-selected-handler [client-game]
+(defn card-selected-handler [uid client-game]
   (let [updated-game (game-logic/forward-game-when client-game)
         event-type (if (game-logic/game-finished? updated-game)
                              :game/game-finished
                              :game/send-game-data)]
-       (games/update-game updated-game)
+       (games/update-game (games/get-game-id-for-uid uid) updated-game)
        (event-sender/multicast-game-to-participants event-type updated-game)))
 
 

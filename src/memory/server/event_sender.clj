@@ -15,5 +15,5 @@
     (doseq [uid (get-uids-of-game game)]
         (websocket/chsk-send! uid event)))
 
-(defn send-error-to-player [error-message uid]
-    (websocket/chsk-send! uid [:error/game-not-found error-message]))
+(defn send-error-to-player [error uid]
+    (websocket/chsk-send! uid error))

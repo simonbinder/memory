@@ -49,13 +49,16 @@ files-clean))))
 (defn player-nil? [game player-key]
     (get-in game [:players player-key]))
 
+
+; with always one player connected, it returns first player-index with nil
 (defn get-nil-player-index [game]
     (if-let [nil-player (first (filter #(-> % last nil?) (-> game :players seq)))]
        (first nil-player)
        nil))
-; with always one player connected, it returns first player-index with nil
 
-(defn add-player-to-game [uid game-id]
+
+;old one, not used anymore
+(defn add-player-to-game-with-side-effects [uid game-id]
     (if-let [game (get @games game-id)]
         (if-let [nil-player-index (get-nil-player-index game)]
             (do
@@ -67,11 +70,10 @@ files-clean))))
 (defn update-users-game-id [uid game-id]
     (swap! users assoc uid game-id))
 
-;; Not used
-(defn add-player-to-game-pure-fn [uid game]
+(defn add-player-to-game [uid game]
     (if-let [nil-player-index (get-nil-player-index game)]
-        (assoc-in game [:players nil-player-index] uid))
-    (throw (Exception. "There are already two players participating in this game.")))
+        (assoc-in game [:players nil-player-index] uid)
+        (throw (Exception. "There are already two players participating in this game."))))
 
 (defn create-new-game [player-one-uid]
     {

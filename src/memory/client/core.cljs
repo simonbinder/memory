@@ -41,17 +41,16 @@
 
 ;; hack to get relative paths
 (defn replace-path [image-path]
-  (let [escaped-path (clojure.string/replace image-path #".\\resources\\public" "..\\..")]
-  (print escaped-path)
-  escaped-path))
+  (if (clojure.string/includes? image-path ".\\resources\\public")
+    (clojure.string/replace image-path #".\\resources\\public" "..\\..")
+    (clojure.string/replace image-path #"./resources/public" "")))
 
 (defn card-item-open [card]
   (fn [{:keys [url]}]
+    (let [path (replace-path url)])
     [:li
     ;; TODO display all open cards
-    ;; [:img {:src (replace-path  (:url (nth (:deck @model/game)1)))}]]))
-    ;; [:img {:src (replace-path url)}]]))
-      [:img {:src "https://images-na.ssl-images-amazon.com/images/I/51B-5V0LYLL._SL1418_.jpg"}]]))
+    [:img {:src (replace-path url)}]]))
 
 (defn card-item-closed [card]
   (fn [{:keys [id]}]

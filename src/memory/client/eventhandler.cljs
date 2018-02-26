@@ -3,46 +3,26 @@
     [memory.client.model :as model]))
 
 (defn get-player-number[game]
-      (let [uid (:player-uid @model/app-state)
-            players (get game :players)
-            player-number (first (filter (comp #{uid} players) (keys players)))]
-      player-number))
+  (let [uid (:player-uid @model/app-state)
+        players (get game :players)
+        player-number (first (filter (comp #{uid} players) (keys players)))]
+        player-number))
 
 (defn set-uid [uid]
   (swap! model/app-state assoc :player-uid uid))
 
 (defn receive-game [server-game]
-        (let [deck (get server-game :deck)
-              players (get server-game :players)
-               active-player (get server-game :active-player)]
-         (swap! model/set-state 2)
-         (swap! model/app-state assoc :player-number (get-player-number server-game))
-         (swap! model/game assoc :deck deck)
-         (swap! model/game assoc :active-player active-player)
-         (swap! model/game assoc :players players)
-         (let [[own-score opponent-score] (model/calc-game-count)]
-         (swap! model/game-count assoc :own-score own-score)
-         (swap! model/game-count assoc :opponent-score opponent-score))
-         ;(println "Server-Game: " server-game)
-         ;(println "Client-Game: "@model/game)
-         ;(println "Game-count "@model/game-count)
-         ;(println @model/app-state)
-         ))
+  (model/set-state 2)
+  ;(model/set-player-number)
+  (swap! model/app-state assoc :player-number (get-player-number server-game))
+  (model/set-game server-game))
 
 (defn finish-game [server-game]
-  (let [deck (get server-game :deck)
-        players (get server-game :players)
-         active-player (get server-game :active-player)]
-   (swap! model/app-state assoc :state 4)
-   (swap! model/game assoc :deck deck)
-   (swap! model/game assoc :active-player active-player)
-   (swap! model/game assoc :players players)
-   (let [[own-score opponent-score] (model/calc-game-count)]
-   (swap! model/game-count assoc :own-score own-score)
-   (swap! model/game-count assoc :opponent-score opponent-score))))
+  (model/set-state 4)
+  (model/set-game server-game))
 
 (defn handle-error [error-message]
   (model/show-error error-message))
 
 (defn set-to-wait []
-  (swap! model/app-state assoc :state 3))
+  (model/set-state 3))

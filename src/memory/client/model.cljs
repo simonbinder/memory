@@ -39,18 +39,35 @@
 (defn set-state [state]
   (swap! app-state assoc :state state))
 
+(defn set-game [new-game]
+  (print new-game)
+  (swap! game assoc :active-player (get new-game :active-player))
+  (swap! game assoc :players (get new-game :players))
+  (swap! game assoc :deck (get new-game :deck))
+  (refresh-game-count))
+
+(defn set-player-number []
+  (if (not= 0 (:player-number @app-state))
+    (do
+      (let [uid (:player-uid @app-state)
+          players (:players @game)
+          player-number (first (filter (comp #{uid} players) (keys players)))]
+      (swap! app-state assoc :player-number player-number)))))
+
 ; -------------------------------------------------------------------------------------------------
-; FUNCTIONS TO CALCULATE SCORES
+; FUNCTIONS TO CALCULATE SCORES AND REFRESH THEM
 
 (defn count-unresolved-cards [deck player-number]
-      (/ (count (filter #(= (% :resolved) player-number) deck)) 2))
+  (/ (count (filter #(= (% :resolved) player-number) deck)) 2))
 
-(defn calc-game-count []
-        (let [deck (get @game :deck)
-        player-number (:player-number @app-state)
-        opponent-number (if (= player-number 1) 2 1)
-        own-score (count-unresolved-cards deck player-number)
-        opponent-score (count-unresolved-cards deck opponent-number)] [own-score opponent-score]))
+(defn refresh-game-count []
+  (let [deck (get @game :deck)
+  player-number (:player-number @app-state)
+  opponent-number (if (= player-number 1) 2 1)
+  own-score (count-unresolved-cards deck player-number)
+  opponent-score (count-unresolved-cards deck opponent-number)]
+  (swap! game-count assoc :own-score own-score)
+  (swap! game-count assoc :opponent-score opponent-score)))
 
 ; -------------------------------------------------------------------------------------------------
 ; FUNCTIONS TO TURN CARD AND CHECK IF PLAYER IS ALLOWED TO
@@ -61,7 +78,7 @@
         index (.indexOf (vec (map :id deck)) id)]
       (swap! game update-in [:deck index] assoc :turned true)
       (swap! app-state update-in [:turned-cards] inc)))
-      
+
 (defn count-turned-cards []
   (count (filter #(= (% :turned) true) (get @game :deck))))
 

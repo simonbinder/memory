@@ -1,9 +1,9 @@
 (ns memory.client.core
-    (:require
-      [reagent.core :as reagent :refer [atom]]
-      [memory.client.model :as model]
-      [memory.client.communication :as communication]
-      [memory.client.eventsender :as eventsender]))
+  (:require
+    [reagent.core :as reagent :refer [atom]]
+    [memory.client.model :as model]
+    [memory.client.communication :as communication]
+    [memory.client.eventsender :as eventsender]))
 
 (enable-console-print!)
 
@@ -35,9 +35,9 @@
     [:p (str "Game-ID: "(:game-id @model/app-state))]])
 
 (defn disconnected-view []
-      [:div#waiting-view
-        [:p "Dein Mitspieler hat das Spiel verlassen. Schicke die untenstehende ID an einen Freund und das Spiel kann fortgesetzt werden."]
-        [:p (str "Game-ID: "(:game-id @model/app-state))]])
+  [:div#waiting-view
+    [:p "Dein Mitspieler hat das Spiel verlassen. Schicke die untenstehende ID an einen Freund und das Spiel kann fortgesetzt werden."]
+    [:p (str "Game-ID: "(:game-id @model/app-state))]])
 
 ;; hack to get relative paths
 (defn replace-path [image-path]
@@ -68,20 +68,20 @@
       )))
 
 (defn gameboard []
-    (let [game @model/game
-          cards (get game :deck)
-          own-score (:own-score @model/game-count)
-          opponent-score (:opponent-score @model/game-count)
-          player (:player-number @model/app-state)]
-    [:div
-      [:div {:class "score"}
-      [:p "Your score is: " own-score]
-      [:p "The opponent score is: " opponent-score]
-      [:p (model/check-if-is-the-players-turn)]]
-      [:div#gameboard  {:class "gameboard"}
-        [:ul#card-list
-        (for [card cards]
-             ^{:key (:id card)} [card-item card])]]]))
+  (let [game @model/game
+        cards (get game :deck)
+        own-score (:own-score @model/game-count)
+        opponent-score (:opponent-score @model/game-count)
+        player (:player-number @model/app-state)]
+  [:div
+    [:div {:class "score"}
+    [:p "Your score is: " own-score]
+    [:p "The opponent score is: " opponent-score]
+    [:p (model/check-if-is-the-players-turn)]]
+    [:div#gameboard  {:class "gameboard"}
+      [:ul#card-list
+      (for [card cards]
+           ^{:key (:id card)} [card-item card])]]]))
 
 (defn main-view []
   [:div
@@ -93,7 +93,6 @@
         1 [waiting-view]
         2 [gameboard]
         3 [disconnected-view])])
-
 
 (reagent/render-component [main-view]
                           (. js/document (getElementById "app")))

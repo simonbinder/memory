@@ -61,8 +61,11 @@
    "It's your turn"
    "It's NOT your turn"))
 
-(defn show-error [error-message]
-  (reset! error error-message))
+   (defn clear-error []
+     (reset! error ""))
 
-(defn clear-error []
-  (reset! error ""))
+(defn show-error [error-message]
+  (reset! error error-message)
+  (let [interval (js/setInterval #(clear-error) 5000)]
+
+  (js/clearInterval interval)))

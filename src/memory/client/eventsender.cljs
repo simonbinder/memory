@@ -25,8 +25,7 @@
 (defn join-game [game-id]
   (print game-id)
   (set-game-id game-id)
-  (communication/join-game game-id join-game-reply)
-  )
+  (communication/join-game game-id join-game-reply))
 
 ;; not implemented yet
 (defn handle-click []

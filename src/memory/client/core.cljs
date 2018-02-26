@@ -50,8 +50,8 @@
     [:li
     ;; TODO display all open cards
     ;; [:img {:src (replace-path  (:url (nth (:deck @model/game)1)))}]]))
-    ;; [:img {:src (replace-path url)}]]))
-      [:img {:src "https://images-na.ssl-images-amazon.com/images/I/51B-5V0LYLL._SL1418_.jpg"}]]))
+    [:img {:src (replace-path url)}]]))
+      ; [:img {:src "https://images-na.ssl-images-amazon.com/images/I/51B-5V0LYLL._SL1418_.jpg"}]]))
 
 (defn card-item-closed [card]
   (fn [{:keys [id]}]

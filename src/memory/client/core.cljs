@@ -45,12 +45,15 @@
     (clojure.string/replace image-path #".\\resources\\public" "..\\..")
     (clojure.string/replace image-path #"./resources/public" "")))
 
+(defn card-item-resolved [card resolved]
+  (fn [{:keys [url]}]
+    [:li {:class (str "resolved resolved-cards-player-" resolved)}
+      [:img {:src (replace-path url)}]]))
+
 (defn card-item-open [card]
   (fn [{:keys [url]}]
-    (let [path (replace-path url)])
     [:li
-    ;; TODO display all open cards
-    [:img {:src (replace-path url)}]]))
+      [:img {:src (replace-path url)}]]))
 
 (defn card-item-closed [card]
   (fn [{:keys [id]}]
@@ -60,11 +63,13 @@
         (turn-card-if-player-is-allowed-to id))}]))
 
 (defn card-item [card]
-  (fn [{:keys [turned, id]}]
-    (if (true? turned)
-      [card-item-open card]
-      [card-item-closed card]
-      )))
+  (fn [{:keys [resolved, turned, id]}]
+    (if (not= resolved 0)
+      [card-item-resolved card resolved]
+      (if (true? turned)
+        [card-item-open card]
+        [card-item-closed card]
+        ))))
 
 (defn gameboard []
   (let [game @model/game

@@ -27,7 +27,7 @@
 ;; 1 -> started (waiting for second player)
 ;; 2 -> started (game can begin)
 ;; 3 -> player disconnected (waiting for second player)
-(defonce app-state (atom {:state 0 :game-id "" :player-number 0 :player-uid "" :turned-cards 0}))
+(defonce app-state (atom {:state 0 :game-id "" :player-number 0 :player-uid ""}))
 
 (defonce game-count (atom {:own-score 0 :opponent-score 0}))
 
@@ -38,6 +38,7 @@
 
 (defn set-state [state]
   (swap! app-state assoc :state state))
+
 ; -------------------------------------------------------------------------------------------------
 ; FUNCTIONS TO CALCULATE SCORES
 
@@ -60,11 +61,15 @@
         index (.indexOf (vec (map :id deck)) id)]
       (swap! game update-in [:deck index] assoc :turned true)
       (swap! app-state update-in [:turned-cards] inc)))
+      
+(defn count-turned-cards []
+  (count (filter #(= (% :turned) true) (get @game :deck))))
 
 (defn check-if-player-is-allowed-to-turn-card [id]
-  (if (and (= (:player-number @app-state) (:active-player @game)) (> 2 (:turned-cards @app-state)))
+  (if (and (= (:player-number @app-state) (:active-player @game)) (> 2 (count-turned-cards)))
     (do
       (turn-card id)
+      (print "im moment sind " (:turned-cards @app-state) "umgedreht")
       true)
       false))
 

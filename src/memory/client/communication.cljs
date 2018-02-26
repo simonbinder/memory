@@ -40,6 +40,8 @@
        :game/send-game-data (eventhandler/receive-game (nth ?data 1))
        :game/waiting-for-player (eventhandler/set-to-wait)
        :game/game-finished (eventhandler/finish-game (nth ?data 1))
+       :error/game-not-found (eventhandler/handle-error (nth ?data 1))
+       :error/too-many-players-in-game (eventhandler/handle-error (nth ?data 1))
        (println ?data))))
 
 (defn send-game [client-game]

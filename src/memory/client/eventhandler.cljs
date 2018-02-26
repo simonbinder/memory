@@ -17,7 +17,7 @@
                active-player (get server-game :active-player)]
          (swap! model/app-state assoc :state 2)
          (if (= 2 (@model/app-state :turned-cards))
-            (swap! model/app-state assoc :turned-cards 0)) 
+            (swap! model/app-state assoc :turned-cards 0))
          (swap! model/app-state assoc :player-number (get-player-number server-game))
          (println "Server-Game: " server-game)
          (swap! model/game assoc :deck deck)
@@ -41,6 +41,9 @@
    (let [[own-score opponent-score] (model/calc-game-count)]
    (swap! model/game-count assoc :own-score own-score)
    (swap! model/game-count assoc :opponent-score opponent-score))))
+
+(defn handle-error [error-message]
+  (model/show-error error-message))
 
 (defn set-to-wait []
         (swap! model/app-state assoc :state 3))

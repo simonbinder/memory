@@ -1,7 +1,8 @@
 (ns memory.server.game-logic-test
   (:require
     [memory.server.game-logic :refer :all]
-    [clojure.test :refer :all]))
+    [clojure.test :refer :all]
+    [clojure.data :refer :all]))
 
 (declare get-card count-resolved-cards-of-player count-resolved-cards count-turned-cards)
 
@@ -100,8 +101,14 @@
 
 (deftest forward-game-when-first-card-selected
     (testing "FORWARD GAME WHEN FIRST CARD SELECTED: "
-        (testing "Nothing tested."
-            (is false))))
+        (testing "When called, game is returned unchanged."
+            (let [expected-game {:active-player 1 :deck [(get-card)(get-card)(get-card "x" true 0)(get-card "x" false 0)]}
+                  actual-game (forward-game-when expected-game)
+                  diff (diff actual-game expected-game)]
+                (is
+                    (and
+                        (-> diff first nil?)
+                        (-> diff (nth 1 :some) nil?)))))))
 
 (deftest forward-game-when-cards-matching
     (testing "FORWARD GAME WHEN CARDS MATCHING "

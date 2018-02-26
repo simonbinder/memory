@@ -4,25 +4,23 @@
         [clojure.test :refer :all]))
 
 (deftest add-player-to-game-add-second-player-to-existing-game-test
-    (testing "Given one existing game, when player two is added to game, then entry for second player is created at index 2."
-        (let [game-id (add-new-game "uid-a")
-              game (add-player-to-game "uid-b" game-id)
+    (testing "When player two is added to game, then entry for second player is created at index 2."
+        (let [game (-> "uid-a" create-new-game)
+              updated-game (add-player-to-game "uid-b" game)
               expected "uid-b"
-              actual (get-in @games [game-id :players 2])]
+              actual (get-in updated-game [:players 2])]
         (is (= actual expected))))
     (testing "Given existing game, when player one is missing, then entry for second player is created at index 1"
-        (let [game-id (-> @games keys first)
-              uid (swap! games assoc-in [game-id :players 1] nil)
-              game (add-player-to-game "uid-c" game-id)
+        (let [game (-> nil create-new-game (assoc-in [:players 2] "uid-a"))
+              updated-game (add-player-to-game "uid-c" game)
               expected "uid-c"
-              actual (get-in @games [game-id :players 1])]
+              actual (get-in updated-game [:players 1])]
             (is (= actual expected)))))
 
 (deftest add-player-to-game-add-third-player-to-existing-game-test
     (testing "Given one existing game with two players, when third player is added to game, then throw exception."
-        (let [game-id (add-new-game "uid-a")
-              game (add-player-to-game "uid-b" game-id)]
-            (is (thrown? Exception (add-player-to-game "uid-c" game-id))))))
+        (let [game {:players {1 "uid-a" 2 "uid-b"}}]
+            (is (thrown? Exception (add-player-to-game "uid-c" game))))))
 
 (defn clean-users []
     (let [uids (keys @users)]

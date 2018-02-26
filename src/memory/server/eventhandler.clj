@@ -44,6 +44,7 @@
         (event-sender/send-error-to-player [:error/game-not-found "Game does not exist"] uid)))
 
 (defn card-selected-handler [uid client-game]
+  (event-sender/multicast-game-to-participants :game/send-game-data client-game)
   (let [updated-game (game-logic/forward-game-when client-game)
         event-type (if (game-logic/game-finished? updated-game)
                              :game/game-finished

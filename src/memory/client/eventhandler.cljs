@@ -13,12 +13,14 @@
 
 (defn receive-game [server-game]
         (let [deck (get server-game :deck)
+              players (get server-game :players)
                active-player (get server-game :active-player)]
          (swap! model/app-state assoc :state 2)
          (swap! model/app-state assoc :player-number (get-player-number server-game))
          (println "Server-Game: " server-game)
          (swap! model/game assoc :deck deck)
          (swap! model/game assoc :active-player active-player)
+         (swap! model/game assoc :players players)
          (let [[own-score opponent-score] (model/calc-game-count)]
          (swap! model/game-count assoc :own-score own-score)
          (swap! model/game-count assoc :opponent-score opponent-score))

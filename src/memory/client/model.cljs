@@ -33,8 +33,16 @@
 
 (defonce error (atom ""))
 
+(defn set-game-id [game-id]
+  (swap! app-state assoc :game-id (str game-id)))
+
+(defn set-state [state]
+  (swap! app-state assoc :state state))
+; -------------------------------------------------------------------------------------------------
+; FUNCTIONS TO CALCULATE SCORES
+
 (defn count-unresolved-cards [deck player-number]
-      ( / (count (filter #(= (% :resolved) player-number) deck)) 2))
+      (/ (count (filter #(= (% :resolved) player-number) deck)) 2))
 
 (defn calc-game-count []
         (let [deck (get @game :deck)
@@ -42,6 +50,9 @@
         opponent-number (if (= player-number 1) 2 1)
         own-score (count-unresolved-cards deck player-number)
         opponent-score (count-unresolved-cards deck opponent-number)] [own-score opponent-score]))
+
+; -------------------------------------------------------------------------------------------------
+; FUNCTIONS TO TURN CARD AND CHECK IF PLAYER IS ALLOWED TO
 
 (defn turn-card [id]
   (let [deck  (get @game :deck)
@@ -62,8 +73,11 @@
    "It's your turn"
    "It's NOT your turn"))
 
-   (defn clear-error []
-     (reset! error ""))
+; -------------------------------------------------------------------------------------------------
+; ERROR HANDLING
+
+(defn clear-error []
+  (reset! error ""))
 
 (defn show-error [error-message]
   (reset! error error-message)

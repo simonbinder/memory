@@ -68,5 +68,3 @@
 (defn show-error [error-message]
   (reset! error error-message)
   (js/setTimeout #(clear-error) 3000))
-  ; (let [interval (js/setInterval #(clear-error) 5000)]
-  ; (js/clearInterval interval)))

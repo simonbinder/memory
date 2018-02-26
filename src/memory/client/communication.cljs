@@ -38,11 +38,12 @@
   (let [[message-type message-payload] ?data]
      (case message-type
        :game/send-game-data (eventhandler/receive-game (nth ?data 1))
+       :game/waiting-for-player (eventhandler/set-to-wait)
+       :game/game-finished (eventhandler/finish-game (nth ?data 1))
        (println ?data))))
 
-(defn send-game [game]
-  (print "communications send-game")
-  (chsk-send! [:game/selected-card {:game game}]))
+(defn send-game [client-game]
+  (chsk-send! [:game/selected-card {:game client-game}]))
 
 (defn print-reply [reply] (println reply))
 

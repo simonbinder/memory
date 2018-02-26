@@ -82,6 +82,19 @@
       (for [card cards]
            ^{:key (:id card)} [card-item card])]]]))
 
+(defn finished-view []
+  (let [own-score (:own-score @model/game-count)
+       opponent-score (:opponent-score @model/game-count)
+       player (:player-number @model/app-state)]
+      [:div
+      [:div {:class "score"}
+      [:p "The Game is over!"]
+      (cond
+        (> own-score opponent-score) [:p "Congratulations! You won with " own-score " uncovered pairs, your opponent only scored " opponent-score]
+        (< own-score opponent-score) [:p "You lost! You uncovered " own-score " pairs, your opponent " opponent-score]
+        (= own-score opponent-score) [:p "It's a draw! Both players reached a count of: " own-score])
+      ]]))
+
 (defn main-view []
   [:div
     [:h1 "Memory"]
@@ -91,7 +104,8 @@
         0 [start-view]
         1 [waiting-view]
         2 [gameboard]
-        3 [disconnected-view])])
+        3 [disconnected-view]
+        4 [finished-view])])
 
 (reagent/render-component [main-view]
                           (. js/document (getElementById "app")))

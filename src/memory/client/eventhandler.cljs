@@ -16,6 +16,8 @@
               players (get server-game :players)
                active-player (get server-game :active-player)]
          (swap! model/app-state assoc :state 2)
+         (if (= 2 (@model/app-state :turned-cards))
+            (swap! model/app-state assoc :turned-cards 0))
          (swap! model/app-state assoc :player-number (get-player-number server-game))
          (println "Server-Game: " server-game)
          (swap! model/game assoc :deck deck)

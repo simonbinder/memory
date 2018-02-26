@@ -35,6 +35,7 @@
   client-game)
 
 (defmethod forward-game-when :cards-matching [client-game]
+    (Thread/sleep 3000)
     (let [deck (get client-game :deck)
           active-player (get client-game :active-player)]
         (-> deck
@@ -43,6 +44,7 @@
            (update-deck-in-game client-game))))
 
 (defmethod forward-game-when :cards-not-matching [client-game]
+  (Thread/sleep 3000)
   (let [deck (get client-game :deck)
         active-player (get client-game :active-player)]
       (-> deck

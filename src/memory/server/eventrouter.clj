@@ -37,8 +37,7 @@
   (broadcast))
 
 (defmethod event :game/selected-card [{:as event :keys [uid ?data]}]
-  (print "event-router selected-card")
-   (eventhandler/card-selected-handler [uid (:game ?data)]))
+   (eventhandler/card-selected-handler uid (:game ?data)))
 
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
     (println "New connection:" uid client-id))

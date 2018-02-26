@@ -2,9 +2,7 @@
  (:require
    [memory.server.eventhandler :as eventhandler]
    ;;TODO Move websocket to eventhandler ns
-   [memory.server.websocket :as websocket])
-)
-
+   [memory.server.websocket :as websocket]))
 
 (defn broadcast []
   (doseq [uid (:any @websocket/connected-uids)]
@@ -12,8 +10,8 @@
 
 ;; Just added for testing
 (defn broadcast-2 []
-    (doseq [uid (:any @websocket/connected-uids)]
-      (websocket/chsk-send! uid [:test-push/bye "Bye!"])))
+  (doseq [uid (:any @websocket/connected-uids)]
+    (websocket/chsk-send! uid [:test-push/bye "Bye!"])))
 
 (defmulti event :id)
 
@@ -23,10 +21,10 @@
       {:game-id game-id} ))))
 
 (defmethod event :game/join-game [{:as ev-msg :keys [event uid client-id ?data ?reply-fn]}]
-    (println "Join Game Called with data:")
-    (println ?data)
-    (println (:game-id ?data))
-    (eventhandler/join-game-handler uid (:game-id ?data)))
+  (println "Join Game Called with data:")
+  (println ?data)
+  (println (:game-id ?data))
+  (eventhandler/join-game-handler uid (:game-id ?data)))
 
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
@@ -37,13 +35,13 @@
   (broadcast))
 
 (defmethod event :game/selected-card [{:as event :keys [uid ?data]}]
-   (eventhandler/card-selected-handler uid (:game ?data)))
+  (eventhandler/card-selected-handler uid (:game ?data)))
 
 (defmethod event :chsk/uidport-open [{:keys [uid client-id]}]
-    (println "New connection:" uid client-id))
+  (println "New connection:" uid client-id))
 
 (defmethod event :chsk/uidport-close [{:keys [uid]}]
-      (eventhandler/player-disconnected-handler uid)
-      (println "Disconnected:" uid))
+  (eventhandler/player-disconnected-handler uid)
+  (println "Disconnected:" uid))
 
 (defmethod event :chsk/ws-ping [_])

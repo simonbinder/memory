@@ -10,10 +10,11 @@
     (keys (get (games/get-game game-id) :players)))))
 
 
-(defn no-player-left? [game]
-  (every? nil? (-> game :players vals)))
+
 
 ;; ------------- handler ---------------------------------
+
+(declare no-player-left?)
 
 (defn create-game-handler [uid]
   (if-let [game-id (games/get-game-id-for-uid uid)]
@@ -32,6 +33,9 @@
       (do
         (games/update-game game-id game)
         (event-sender/multicast-event-to-participants-of-game [:game/waiting-for-player "Waiting for second player to connect"] game)))))
+
+(defn no-player-left? [game]
+  (every? nil? (-> game :players vals)))
 
 (defn join-game-handler [uid game-id]
   (if-let [game (-> game-id games/get-game)]

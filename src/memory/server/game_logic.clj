@@ -75,13 +75,3 @@
 
 (defn filter-unresolved-cards [deck]
   (filter #(= (:resolved %) 0) deck))
-
-;; --------------------------
-
-(defn get-active-player-uid [game]
-  ((:players game)(:active-player game)))
-
-;;TODO Do we need this?
-(defn validate-player-action [sender-uid game]
-  (if (not= sender-uid (get-active-player-uid game))
-    (throw (.Exception (str "Event received from player ")))))

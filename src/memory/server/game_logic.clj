@@ -12,6 +12,8 @@
     game-finished?
     filter-unresolved-cards)
 
+;; --------------------------------- compute game state ---------------------------------
+
 (defn determine-game-state [game]
   (let [turned (-> game :deck filter-turned-cards)]
     (if (= 1 (count turned))

@@ -3,11 +3,10 @@
     [taoensso.sente.server-adapters.http-kit      :refer (get-sch-adapter)]
     [taoensso.sente :as sente]))
 
-
-  ;; currently client-id and uid are the same
 (defn create-user-id [{:keys [params]}]
   (:client-id params))
 
+;; used to establish connection with websockets
 (let [packer :edn
   chsk-server
   (sente/make-channel-socket-server!

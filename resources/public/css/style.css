@@ -1,7 +1,79 @@
-/* some style */
+#body {
+  font-family: 'Amatic SC';
+  font-size: 200%;
+}
+
+#headline {
+  font-size: 50px;
+  width: 200px;
+  margin: 30px auto;
+  text-align: center;
+}
+
+#gameboard{
+  margin: auto;
+  width: 620px;
+  padding-right: 20px;
+}
+
+#score {
+  float: left;
+  margin: -180px 0 0 20px;
+
+}
+
+#score p{
+font-size: 20px;
+font-weight: bold;
+}
+
+#waiting-view, #finished-view {
+  width: 500px;
+  text-align: center;
+  margin: 10px auto;
+}
+
+.button {
+  -webkit-border-radius: 5;
+  -moz-border-radius: 5;
+  border-radius: 5px;
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: lighter;
+  background: #000000;
+  padding: 10px;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  width: 300px;
+  margin: 10px auto;
+}
+
+.button:hover {
+  background: #262626;
+  text-decoration: none;
+}
+
+.inputfield {
+  width: 300px;
+  margin: 10px auto;
+  display: block;
+  padding: 10px;
+  border: 1px solid #e5e5e5;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 25px;
+  font-weight:300;
+}
+
+.inputfield:focus {
+  border: 1px solid #222222;
+  outline: none;
+}
 
 li {
-  background-color: green;
+  background-color: black;
   width: 120px;
   height: 120px;
   float: left;
@@ -9,34 +81,31 @@ li {
   text-align: center;
   list-style: none;
   overflow: hidden;
-  border: 3px solid white;
+  border: 0px solid rgba(0,0,0,0.0);
+  -webkit-box-shadow: 4px 4px 8px 0px rgba(0,0,0,0.32);
+  -moz-box-shadow: 4px 4px 8px 0px rgba(0,0,0,0.32);
+  box-shadow: 4px 4px 8px 0px rgba(0,0,0,0.32);
 }
 
 img {
   height: 120px;
 }
 
-.gameboard{
-  width: 40%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.score{
-  float: left;
+.resolved{
+  opacity: 0.7;
 }
 
 .resolved-cards-player-1{
-  border: 3px solid yellow;
+  border: 3px solid #cf6700;
 }
 
 .resolved-cards-player-2{
-  border: 3px solid orange;
+  border: 3px solid #38a516;
 }
 
-.resolved{
-  opacity: 0.7;
+p {
+  font-size: 35px;
+  font-weight: 300;
 }
 
 #error{

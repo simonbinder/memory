@@ -15,28 +15,32 @@
   (let [input-value (atom "")]
   (fn []
     [:div#start-view
-    [:input  {:type "button"
-              :value "Spiel starten"
-              :on-click
-                (fn [e]
-                  (communication/create-game eventsender/start-game-reply))}]
-    [:input  {:type "button"
-              :value "Spiel beitreten"
-              :on-click
-                (fn [e]
-                  (eventsender/join-game @input-value))}]
-    [:input {:type "text"
-             :value @input-value
-             :on-change #(reset! input-value (-> % .-target .-value))}]])))
+      [:input  {:class "button"
+                :type "button"
+                :value "START GAME"
+                :on-click
+                  (fn [e]
+                    (communication/create-game eventsender/start-game-reply))}]
+      [:input  {:class "button"
+                :type "button"
+                :value "JOIN GAME"
+                :on-click
+                  (fn [e]
+                    (eventsender/join-game @input-value))}]
+      [:input {:class "inputfield"
+               :type "text"
+               :value @input-value
+               :on-change #(reset! input-value (-> % .-target .-value))}]])))
 
 (defn waiting-view []
   [:div#waiting-view
-    [:p "Schicke die unten angegebene Game-ID an einen Freund. Sobald dieser dem Spiel beitritt kann das Spiel beginnen."]
-    [:p (str "Game-ID: "(:game-id @model/app-state))]])
+    [:p "Send the Game ID below to a friend. As soon as he joins the game, the game can start."]
+    [:p  "Game-ID: "]
+    [:p (str (:game-id @model/app-state))]])
 
 (defn disconnected-view []
   [:div#waiting-view
-    [:p "Dein Mitspieler hat das Spiel verlassen. Schicke die untenstehende ID an einen Freund und das Spiel kann fortgesetzt werden."]
+    [:p "Your opponent has left the game. Send the ID below to a friend and the game can continue."]
     [:p (str "Game-ID: "(:game-id @model/app-state))]])
 
 ;; hack to get relative paths
@@ -78,31 +82,30 @@
         opponent-score (:opponent-score @model/game-count)
         player (:player-number @model/app-state)]
   [:div
-    [:div {:class "score"}
-    [:p "Your score is: " own-score]
-    [:p "The opponent score is: " opponent-score]
-    [:p (model/check-if-is-the-players-turn)]]
-    [:div#gameboard  {:class "gameboard"}
+    [:div#gameboard
       [:ul#card-list
       (for [card cards]
-           ^{:key (:id card)} [card-item card])]]]))
+           ^{:key (:id card)} [card-item card])]]
+    [:div#score
+      [:p "Your score is: " own-score]
+      [:p "The opponent score is: " opponent-score]
+      [:p (model/check-if-is-the-players-turn)]]]))
 
 (defn finished-view []
   (let [own-score (:own-score @model/game-count)
        opponent-score (:opponent-score @model/game-count)
        player (:player-number @model/app-state)]
-      [:div
-      [:div {:class "score"}
+      [:div#finished-view
       [:p "The Game is over!"]
       (cond
         (> own-score opponent-score) [:p "Congratulations! You won with " own-score " uncovered pairs, your opponent only scored " opponent-score]
         (< own-score opponent-score) [:p "You lost! You uncovered " own-score " pairs, your opponent " opponent-score]
         (= own-score opponent-score) [:p "It's a draw! Both players reached a count of: " own-score])
-      ]]))
+      ]))
 
 (defn main-view []
   [:div
-    [:h1 "Memory"]
+    [:h1#headline "Memory"]
     (if (not= @model/error "")
       [:p#error @model/error])
     (case (:state @model/app-state)

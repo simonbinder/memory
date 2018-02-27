@@ -10,8 +10,6 @@
     (keys (get (games/get-game game-id) :players)))))
 
 
-
-
 ;; ------------- handler ---------------------------------
 
 (declare no-player-left?)

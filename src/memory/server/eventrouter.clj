@@ -1,17 +1,9 @@
 (ns memory.server.eventrouter
  (:require
    [memory.server.eventhandler :as eventhandler]
-   ;;TODO Move websocket to eventhandler ns
    [memory.server.websocket :as websocket]))
 
-(defn broadcast []
-  (doseq [uid (:any @websocket/connected-uids)]
-    (websocket/chsk-send! uid [:test-push/hello "Hello Test!"])))
-
-;; Just added for testing
-(defn broadcast-2 []
-  (doseq [uid (:any @websocket/connected-uids)]
-    (websocket/chsk-send! uid [:test-push/bye "Bye!"])))
+;; --------------------------------- event routing ---------------------------------
 
 (defmulti event :id)
 
@@ -28,11 +20,6 @@
 
 (defmethod event :default [{:as ev-msg :keys [event]}]
   (println "Unhandled event: " event))
-
-;; ctrl , then shift b
-(defmethod event :test/id1 [{:as ev-msg :keys [event uid client-id ?data]}]
-  (println "Hello from User: " uid client-id ?data)
-  (broadcast))
 
 (defmethod event :game/selected-card [{:as event :keys [uid ?data]}]
   (eventhandler/card-selected-handler uid (:game ?data)))

@@ -11,7 +11,6 @@
     [ring.util.response :as response]))
 
 (compojure/defroutes routes
-  ; (compojure/GET "/status" req (str "Running: " (pr-str @(:connected-uids channel-socket))))
   (compojure/GET "/chsk"  req (websocket/ring-ajax-get-or-ws-handshake req))
   (compojure/POST "/chsk" req (websocket/ring-ajax-post req)))
 
@@ -21,7 +20,6 @@
 
 (def my-app
   (-> routes
-    ;; Add necessary Ring middleware:
     (wrap-keyword-params)
     (wrap-params)
     (cors/wrap-cors :access-control-allow-origin [#".*"]

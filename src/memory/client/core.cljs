@@ -34,13 +34,13 @@
 
 (defn waiting-view []
   [:div#waiting-view
-    [:p "Schicke die unten angegebene Game-ID an einen Freund. Sobald dieser dem Spiel beitritt kann das Spiel beginnen."]
+    [:p "Send the Game ID below to a friend. As soon as he joins the game, the game can start."]
     [:p  "Game-ID: "]
     [:p (str (:game-id @model/app-state))]])
 
 (defn disconnected-view []
   [:div#waiting-view
-    [:p "Dein Mitspieler hat das Spiel verlassen. Schicke die untenstehende ID an einen Freund und das Spiel kann fortgesetzt werden."]
+    [:p "Your opponent has left the game. Send the ID below to a friend and the game can continue."]
     [:p (str "Game-ID: "(:game-id @model/app-state))]])
 
 ;; hack to get relative paths

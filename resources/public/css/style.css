@@ -1,4 +1,10 @@
+#body {
+  font-family: 'Amatic SC';
+  font-size: 200%;
+}
+
 #headline {
+  font-size: 50px;
   width: 200px;
   margin: 30px auto;
   text-align: center;
@@ -10,9 +16,15 @@
   padding-right: 20px;
 }
 
-#score{
+#score {
   float: left;
-  margin: -180px 0 0 20px;
+  margin: -80px 0 0 20px;
+
+}
+
+#score p{
+font-size: 20px;
+font-weight: bold;
 }
 
 #waiting-view, #finished-view {
@@ -26,7 +38,7 @@
   -moz-border-radius: 5;
   border-radius: 5px;
   color: #ffffff;
-  font-size: 15px;
+  font-size: 25px;
   font-weight: lighter;
   background: #000000;
   padding: 10px;
@@ -51,7 +63,7 @@
   -webkit-border-radius: 5px;
   border-radius: 5px;
   text-align: center;
-  font-size: 15px;
+  font-size: 25px;
   font-weight:300;
 }
 
@@ -92,7 +104,7 @@ img {
 }
 
 p {
-  font-size: 15px;
+  font-size: 35px;
   font-weight: 300;
 }
 

@@ -18,7 +18,7 @@
 
 #score {
   float: left;
-  margin: -180px 0 0 20px;
+  margin: -192px 0 0 20px;
 
 }
 
@@ -109,5 +109,8 @@ p {
 }
 
 #error{
+  text-align: center;
   color: red;
+  width: 500px;
+  margin: 10px auto;
 }

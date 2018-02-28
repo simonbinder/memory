@@ -41,13 +41,14 @@
 (defn disconnected-view []
   [:div#waiting-view
     [:p "Your opponent has left the game. Send the ID below to a friend and the game can continue."]
-    [:p (str "Game-ID: "(:game-id @model/app-state))]])
+    [:p  "Game-ID: "]
+    [:p (str (:game-id @model/app-state))]])
 
 ;; hack to get relative paths
 (defn replace-path [image-path]
   (if (clojure.string/includes? image-path ".\\resources\\public")
-    (clojure.string/replace image-path #".\\resources\\public" "..\\..")
-    (clojure.string/replace image-path #"./resources/public" "")))
+    (clojure.string/replace image-path #".\\resources\\public" "..\\..") ;Windows-path
+    (clojure.string/replace image-path #"./resources/public" ""))) ;Mac-path
 
 (defn card-item-resolved [card resolved]
   (fn [{:keys [url]}]
@@ -117,9 +118,3 @@
 
 (reagent/render-component [main-view]
                           (. js/document (getElementById "app")))
-
-(defn on-js-reload []
-  ;; optionally touch your app-state to force rerendering depending on
-  ;; your application
-  ;; (swap! app-state update-in [:__figwheel_counter] inc)
-)

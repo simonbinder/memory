@@ -1,39 +1,26 @@
 # memory
 
-FIXME: Write a one-line description of your library/project.
-
-## Overview
-
-FIXME: Write a paragraph about the library/project and highlight its goals.
+This is an online-two-player memory game realized in clojure and reagent.
 
 ## Setup
 
-To get an interactive development environment run:
+Frontend and backend run on seperate servers. To start the frontend, run:
 
     lein figwheel
 
 and open your browser at [localhost:3449](http://localhost:3449/).
-This will auto compile and send all changes to the browser without the
-need to reload. After the compilation process is complete, you will
-get a Browser Connected REPL. An easy way to try it is:
 
-    (js/alert "Am I connected?")
 
-and you should see an alert in the browser window.
+To start the backend, open a seperate console window and run:
 
-To clean all compiled files:
+    lein run
 
-    lein clean
+To get an interactive development environment, you can also run:
 
-To create a production build run:
+    lein repl
 
-    lein do clean, cljsbuild once min
+Once the repl has started, run:
 
-And open your browser in `resources/public/index.html`. You will not
-get live reloading, nor a REPL. 
+    (-main)
 
-## License
-
-Copyright © 2014 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
+and the server starts in an interactive repl.

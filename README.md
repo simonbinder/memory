@@ -13,14 +13,14 @@ and open your browser at [localhost:3449](http://localhost:3449/).
 
 To start the backend, open a seperate console window and run:
 
-  lein run
+    lein run
 
 To get an interactive development environment, you can also run:
 
-      lein repl
+    lein repl
 
 Once the repl has started, run:
 
-      (-main)
+    (-main)
 
 and the server starts in an interactive repl.

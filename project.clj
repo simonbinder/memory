@@ -15,7 +15,6 @@
                  [com.taoensso/sente "1.12.0"]
                  [compojure "1.6.0"]
                  [ring/ring-defaults "0.3.1"]
-                 [re-frame "0.10.1"]
                  [digest "1.4.6"]]
 
   :plugins [[lein-figwheel "0.5.14"]
